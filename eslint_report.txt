@@ -1,0 +1,376 @@
+
+> flowforge@0.0.0 lint
+> eslint .
+
+
+/Users/ayushtiwari/FlowForge/server/config/db.js
+   1:18  error  'require' is not defined  no-undef
+   5:41  error  'process' is not defined  no-undef
+   9:5   error  'process' is not defined  no-undef
+  13:1   error  'module' is not defined   no-undef
+
+/Users/ayushtiwari/FlowForge/server/controllers/authController.js
+   1:30  error  'require' is not defined  no-undef
+   2:14  error  'require' is not defined  no-undef
+   3:23  error  'require' is not defined  no-undef
+  84:1   error  'module' is not defined   no-undef
+
+/Users/ayushtiwari/FlowForge/server/controllers/commentController.js
+   1:17  error  'require' is not defined  no-undef
+   2:14  error  'require' is not defined  no-undef
+   3:22  error  'require' is not defined  no-undef
+  93:1   error  'module' is not defined   no-undef
+
+/Users/ayushtiwari/FlowForge/server/controllers/notificationController.js
+   1:22  error  'require' is not defined  no-undef
+  49:1   error  'module' is not defined   no-undef
+
+/Users/ayushtiwari/FlowForge/server/controllers/projectController.js
+    1:30  error  'require' is not defined  no-undef
+    2:17  error  'require' is not defined  no-undef
+    3:19  error  'require' is not defined  no-undef
+  146:1   error  'module' is not defined   no-undef
+
+/Users/ayushtiwari/FlowForge/server/controllers/taskController.js
+    1:30  error  'require' is not defined                        no-undef
+    2:14  error  'require' is not defined                        no-undef
+    3:17  error  'require' is not defined                        no-undef
+    4:7   error  'Workspace' is assigned a value but never used  no-unused-vars
+    4:19  error  'require' is not defined                        no-undef
+    5:22  error  'require' is not defined                        no-undef
+  236:1   error  'module' is not defined                         no-undef
+
+/Users/ayushtiwari/FlowForge/server/controllers/userController.js
+   1:30  error  'require' is not defined  no-undef
+   2:14  error  'require' is not defined  no-undef
+  59:1   error  'module' is not defined   no-undef
+
+/Users/ayushtiwari/FlowForge/server/controllers/workspaceController.js
+    1:30  error  'require' is not defined  no-undef
+    2:19  error  'require' is not defined  no-undef
+    3:14  error  'require' is not defined  no-undef
+  156:1   error  'module' is not defined   no-undef
+
+/Users/ayushtiwari/FlowForge/server/middleware/authMiddleware.js
+   1:13  error  'require' is not defined  no-undef
+   2:14  error  'require' is not defined  no-undef
+  22:39  error  'process' is not defined  no-undef
+  44:1   error  'module' is not defined   no-undef
+
+/Users/ayushtiwari/FlowForge/server/middleware/errorMiddleware.js
+   9:38  error  'next' is defined but never used  no-unused-vars
+  40:9   error  'process' is not defined          no-undef
+  44:1   error  'module' is not defined           no-undef
+
+/Users/ayushtiwari/FlowForge/server/models/Comment.js
+   1:18  error  'require' is not defined  no-undef
+  27:1   error  'module' is not defined   no-undef
+
+/Users/ayushtiwari/FlowForge/server/models/Notification.js
+   1:18  error  'require' is not defined  no-undef
+  41:1   error  'module' is not defined   no-undef
+
+/Users/ayushtiwari/FlowForge/server/models/Project.js
+   1:18  error  'require' is not defined  no-undef
+  68:1   error  'module' is not defined   no-undef
+
+/Users/ayushtiwari/FlowForge/server/models/Task.js
+   1:18  error  'require' is not defined  no-undef
+  63:1   error  'module' is not defined   no-undef
+
+/Users/ayushtiwari/FlowForge/server/models/User.js
+   1:18  error  'require' is not defined  no-undef
+   2:16  error  'require' is not defined  no-undef
+  54:1   error  'module' is not defined   no-undef
+
+/Users/ayushtiwari/FlowForge/server/models/Workspace.js
+   1:18  error  'require' is not defined  no-undef
+  54:1   error  'module' is not defined   no-undef
+
+/Users/ayushtiwari/FlowForge/server/routes/authRoutes.js
+   1:17  error  'require' is not defined  no-undef
+   2:18  error  'require' is not defined  no-undef
+   3:36  error  'require' is not defined  no-undef
+   4:21  error  'require' is not defined  no-undef
+  23:1   error  'module' is not defined   no-undef
+
+/Users/ayushtiwari/FlowForge/server/routes/commentRoutes.js
+   1:17  error  'require' is not defined  no-undef
+   2:52  error  'require' is not defined  no-undef
+   3:21  error  'require' is not defined  no-undef
+  18:1   error  'module' is not defined   no-undef
+
+/Users/ayushtiwari/FlowForge/server/routes/notificationRoutes.js
+   1:17  error  'require' is not defined  no-undef
+   2:55  error  'require' is not defined  no-undef
+   3:21  error  'require' is not defined  no-undef
+  13:1   error  'module' is not defined   no-undef
+
+/Users/ayushtiwari/FlowForge/server/routes/projectRoutes.js
+   1:17  error  'require' is not defined  no-undef
+   2:18  error  'require' is not defined  no-undef
+   6:5   error  'require' is not defined  no-undef
+   7:21  error  'require' is not defined  no-undef
+  25:1   error  'module' is not defined   no-undef
+
+/Users/ayushtiwari/FlowForge/server/routes/taskRoutes.js
+   1:17  error  'require' is not defined  no-undef
+   2:18  error  'require' is not defined  no-undef
+   7:5   error  'require' is not defined  no-undef
+   8:21  error  'require' is not defined  no-undef
+  37:1   error  'module' is not defined   no-undef
+
+/Users/ayushtiwari/FlowForge/server/routes/userRoutes.js
+   1:17  error  'require' is not defined  no-undef
+   2:18  error  'require' is not defined  no-undef
+   3:52  error  'require' is not defined  no-undef
+   4:21  error  'require' is not defined  no-undef
+  21:1   error  'module' is not defined   no-undef
+
+/Users/ayushtiwari/FlowForge/server/routes/workspaceRoutes.js
+   1:17  error  'require' is not defined  no-undef
+   2:18  error  'require' is not defined  no-undef
+   6:5   error  'require' is not defined  no-undef
+   7:21  error  'require' is not defined  no-undef
+  25:1   error  'module' is not defined   no-undef
+
+/Users/ayushtiwari/FlowForge/server/scripts/seed.js
+    1:1   error  'require' is not defined                 no-undef
+    2:18  error  'require' is not defined                 no-undef
+    3:16  error  'require' is not defined                 no-undef
+    4:19  error  'require' is not defined                 no-undef
+    6:14  error  'require' is not defined                 no-undef
+    7:19  error  'require' is not defined                 no-undef
+    8:17  error  'require' is not defined                 no-undef
+    9:14  error  'require' is not defined                 no-undef
+   10:17  error  'require' is not defined                 no-undef
+   11:22  error  'require' is not defined                 no-undef
+   85:30  error  'p6' is assigned a value but never used  no-unused-vars
+  145:3   error  'process' is not defined                 no-undef
+  151:3   error  'process' is not defined                 no-undef
+
+/Users/ayushtiwari/FlowForge/server/server.js
+   1:1   error  'require' is not defined  no-undef
+   2:17  error  'require' is not defined  no-undef
+   3:14  error  'require' is not defined  no-undef
+   4:20  error  'require' is not defined  no-undef
+   5:14  error  'require' is not defined  no-undef
+   6:19  error  'require' is not defined  no-undef
+   7:36  error  'require' is not defined  no-undef
+   8:20  error  'require' is not defined  no-undef
+  11:20  error  'require' is not defined  no-undef
+  12:20  error  'require' is not defined  no-undef
+  13:25  error  'require' is not defined  no-undef
+  14:23  error  'require' is not defined  no-undef
+  15:20  error  'require' is not defined  no-undef
+  16:23  error  'require' is not defined  no-undef
+  17:28  error  'require' is not defined  no-undef
+  29:13  error  'process' is not defined  no-undef
+  40:13  error  'process' is not defined  no-undef
+  52:18  error  'process' is not defined  no-undef
+  71:14  error  'process' is not defined  no-undef
+  74:34  error  'process' is not defined  no-undef
+  75:39  error  'process' is not defined  no-undef
+  80:1   error  'process' is not defined  no-undef
+  82:22  error  'process' is not defined  no-undef
+
+/Users/ayushtiwari/FlowForge/server/socket/socketServer.js
+  43:1  error  'module' is not defined  no-undef
+
+/Users/ayushtiwari/FlowForge/server/utils/generateToken.js
+  1:13  error  'require' is not defined  no-undef
+  4:35  error  'process' is not defined  no-undef
+  5:16  error  'process' is not defined  no-undef
+  9:1   error  'module' is not defined   no-undef
+
+/Users/ayushtiwari/FlowForge/src/components/board/TaskDetailModal.jsx
+   2:18  error  'AnimatePresence' is defined but never used           no-unused-vars
+  33:10  error  'loadingComments' is assigned a value but never used  no-unused-vars
+  44:16  error  'err' is defined but never used                       no-unused-vars
+
+/Users/ayushtiwari/FlowForge/src/components/layout/MobileNav.jsx
+  1:19  error  'useNavigate' is defined but never used  no-unused-vars
+  2:10  error  'useApp' is defined but never used       no-unused-vars
+
+/Users/ayushtiwari/FlowForge/src/context/AppContext.jsx
+   41:17  error    'setError' is assigned a value but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       no-unused-vars
+  107:5   error    Error: Cannot access variable before it is declared
+
+`loadWorkspaces` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+  105 |   useEffect(() => {
+  106 |     if (!currentUser) return;
+> 107 |     loadWorkspaces();
+      |     ^^^^^^^^^^^^^^ `loadWorkspaces` accessed before it is declared
+  108 |     loadNotifications();
+  109 |     // Connect socket then join personal room
+  110 |     const socket = socketService.connect();
+
+  123 |   }, [currentUser?._id]);
+  124 |
+> 125 |   const loadWorkspaces = async () => {
+      |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 126 |     try {
+      | ^^^^^^^^^
+> 127 |       setLoading(l => ({ ...l, workspace: true }));
+      …
+      | ^^^^^^^^^
+> 137 |     }
+      | ^^^^^^^^^
+> 138 |   };
+      | ^^^^^ `loadWorkspaces` is declared here
+  139 |
+  140 |   // Load projects and tasks when activeWorkspace changes
+  141 |   useEffect(() => {                                                                                                                                                                                                                            react-hooks/immutability
+  108:5   error    Error: Cannot access variable before it is declared
+
+`loadNotifications` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+  106 |     if (!currentUser) return;
+  107 |     loadWorkspaces();
+> 108 |     loadNotifications();
+      |     ^^^^^^^^^^^^^^^^^ `loadNotifications` accessed before it is declared
+  109 |     // Connect socket then join personal room
+  110 |     const socket = socketService.connect();
+  111 |     if (socket) {
+
+  201 |   };
+  202 |
+> 203 |   const loadNotifications = async () => {
+      |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 204 |     try {
+      | ^^^^^^^^^
+> 205 |       const data = await notificationService.getAll();
+      | ^^^^^^^^^
+> 206 |       setNotifications(data.notifications || []);
+      | ^^^^^^^^^
+> 207 |     } catch {
+      | ^^^^^^^^^
+> 208 |       // silent
+      | ^^^^^^^^^
+> 209 |     }
+      | ^^^^^^^^^
+> 210 |   };
+      | ^^^^^ `loadNotifications` is declared here
+  211 |
+  212 |   // ─────────────────────────────────────────────────────────────────────────
+  213 |   // Socket.IO real-time listeners — bound once when user is present  react-hooks/immutability
+  123:6   warning  React Hook useEffect has missing dependencies: 'currentUser' and 'loadWorkspaces'. Either include them or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               react-hooks/exhaustive-deps
+  143:5   error    Error: Cannot access variable before it is declared
+
+`loadProjects` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+  141 |   useEffect(() => {
+  142 |     if (!activeWorkspace) return;
+> 143 |     loadProjects(activeWorkspace._id);
+      |     ^^^^^^^^^^^^ `loadProjects` accessed before it is declared
+  144 |     loadWorkspaceTasks(activeWorkspace._id);
+  145 |     const socket = socketService.getSocket();
+  146 |     if (socket?.connected) {
+
+  151 |   }, [activeWorkspace?._id]);
+  152 |
+> 153 |   const loadProjects = async (workspaceId) => {
+      |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 154 |     try {
+      | ^^^^^^^^^
+> 155 |       setLoading(l => ({ ...l, project: true }));
+      …
+      | ^^^^^^^^^
+> 171 |     }
+      | ^^^^^^^^^
+> 172 |   };
+      | ^^^^^ `loadProjects` is declared here
+  173 |
+  174 |   const loadWorkspaceTasks = async (workspaceId) => {
+  175 |     try {                                                                                                                                                                                                    react-hooks/immutability
+  144:5   error    Error: Cannot access variable before it is declared
+
+`loadWorkspaceTasks` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+  142 |     if (!activeWorkspace) return;
+  143 |     loadProjects(activeWorkspace._id);
+> 144 |     loadWorkspaceTasks(activeWorkspace._id);
+      |     ^^^^^^^^^^^^^^^^^^ `loadWorkspaceTasks` accessed before it is declared
+  145 |     const socket = socketService.getSocket();
+  146 |     if (socket?.connected) {
+  147 |       socketService.joinWorkspace(activeWorkspace._id);
+
+  172 |   };
+  173 |
+> 174 |   const loadWorkspaceTasks = async (workspaceId) => {
+      |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 175 |     try {
+      | ^^^^^^^^^
+> 176 |       setLoading(l => ({ ...l, tasks: true }));
+      …
+      | ^^^^^^^^^
+> 183 |     }
+      | ^^^^^^^^^
+> 184 |   };
+      | ^^^^^ `loadWorkspaceTasks` is declared here
+  185 |
+  186 |   // Derive column-grouped tasks when activeProject or allTasks changes
+  187 |   useEffect(() => {                                                                                                                           react-hooks/immutability
+  151:6   warning  React Hook useEffect has missing dependencies: 'activeWorkspace', 'loadProjects', and 'loadWorkspaceTasks'. Either include them or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      react-hooks/exhaustive-deps
+  189:7   error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  187 |   useEffect(() => {
+  188 |     if (!activeProject) {
+> 189 |       setTasks({ backlog: [], todo: [], inprogress: [], review: [], done: [] });
+      |       ^^^^^^^^ Avoid calling setState() directly within an effect
+  190 |       return;
+  191 |     }
+  192 |     socketService.joinProject(activeProject._id);                                                                                                                                                                   react-hooks/set-state-in-effect
+  270:6   warning  React Hook useEffect has missing dependencies: 'currentUser' and 'showToast'. Either include them or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    react-hooks/exhaustive-deps
+  270:7   warning  React Hook useEffect has a complex expression in the dependency array. Extract it to a separate variable so it can be statically checked                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            react-hooks/exhaustive-deps
+  367:14  error    Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      react-refresh/only-export-components
+
+/Users/ayushtiwari/FlowForge/src/pages/Calendar.jsx
+  4:10  error  'PriorityBadge' is defined but never used  no-unused-vars
+
+/Users/ayushtiwari/FlowForge/src/pages/Dashboard.jsx
+  4:10  error  'Avatar' is defined but never used          no-unused-vars
+  5:28  error  'RiCheckboxLine' is defined but never used  no-unused-vars
+  5:44  error  'RiAlertLine' is defined but never used     no-unused-vars
+
+/Users/ayushtiwari/FlowForge/src/pages/Settings.jsx
+  30:7  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  28 |   useEffect(() => {
+  29 |     if (currentUser) {
+> 30 |       setName(currentUser.name || '');
+     |       ^^^^^^^ Avoid calling setState() directly within an effect
+  31 |       setEmail(currentUser.email || '');
+  32 |     }
+  33 |   }, [currentUser]);                             react-hooks/set-state-in-effect
+  37:7  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  35 |   useEffect(() => {
+  36 |     if (activeWorkspace) {
+> 37 |       setWsName(activeWorkspace.name || '');
+     |       ^^^^^^^^^ Avoid calling setState() directly within an effect
+  38 |       setWsDesc(activeWorkspace.description || '');
+  39 |     }
+  40 |   }, [activeWorkspace]);  react-hooks/set-state-in-effect
+
+✖ 148 problems (144 errors, 4 warnings)
+
