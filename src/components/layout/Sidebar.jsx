@@ -2,10 +2,11 @@ import { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useApp } from '../../context/AppContext';
+import Logo from '../ui/Logo';
 import {
   RiDashboardLine, RiKanbanView2, RiCalendarLine, RiTeamLine,
   RiBellLine, RiSettings3Line, RiUserLine, RiAddLine,
-  RiArrowDownSLine, RiLogoutBoxLine, RiFlowChart,
+  RiArrowDownSLine, RiLogoutBoxLine,
 } from 'react-icons/ri';
 
 const navItems = [
@@ -31,7 +32,7 @@ export default function Sidebar() {
   const [wsOpen, setWsOpen] = useState(false);
   const navigate = useNavigate();
 
-  if (!currentUser || !activeWorkspace) return null;
+  if (!currentUser) return null;
 
   const handleLogout = () => {
     logout();
@@ -41,31 +42,38 @@ export default function Sidebar() {
   return (
     <aside className="hidden lg:flex flex-col w-60 h-screen bg-surface border-r border-border fixed left-0 top-0 z-40">
       {/* Logo */}
-      <div className="flex items-center gap-2.5 px-5 py-5 border-b border-border">
-        <div className="w-8 h-8 rounded-xl bg-bronze flex items-center justify-center shadow-glow">
-          <RiFlowChart className="text-floral text-lg" />
-        </div>
-        <span className="text-floral font-bold text-lg tracking-tight">FlowForge</span>
+      <div className="flex items-center px-5 py-4 border-b border-border">
+        <Logo size="md" />
       </div>
 
       {/* Workspace Switcher */}
       <div className="px-3 py-3 border-b border-border">
-        <button
-          onClick={() => setWsOpen(o => !o)}
-          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-surface-2 transition-all duration-200 group"
-        >
-          <div className="w-7 h-7 rounded-lg bg-surface-3 flex items-center justify-center text-sm flex-shrink-0">
-            {activeWorkspace.icon || '🏢'}
-          </div>
-          <div className="flex-1 min-w-0 text-left">
-            <p className="text-sm font-semibold text-bone truncate">{activeWorkspace.name}</p>
-            <p className="text-xs text-olive">Workspace</p>
-          </div>
-          <RiArrowDownSLine className={`text-olive transition-transform duration-200 flex-shrink-0 ${wsOpen ? 'rotate-180' : ''}`} />
-        </button>
+        {activeWorkspace ? (
+          <button
+            onClick={() => setWsOpen(o => !o)}
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-surface-2 transition-all duration-200 group"
+          >
+            <div className="w-7 h-7 rounded-lg bg-surface-3 flex items-center justify-center text-sm flex-shrink-0">
+              {activeWorkspace.icon || '📁'}
+            </div>
+            <div className="flex-1 min-w-0 text-left">
+              <p className="text-sm font-semibold text-bone truncate">{activeWorkspace.name}</p>
+              <p className="text-xs text-olive">Workspace</p>
+            </div>
+            <RiArrowDownSLine className={`text-olive transition-transform duration-200 flex-shrink-0 ${wsOpen ? 'rotate-180' : ''}`} />
+          </button>
+        ) : (
+          <button
+            onClick={() => navigate('/workspace')}
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-surface-2 transition-all duration-200 text-olive hover:text-bone text-sm"
+          >
+            <RiAddLine className="text-base" />
+            <span>Create Workspace</span>
+          </button>
+        )}
 
         <AnimatePresence>
-          {wsOpen && (
+          {wsOpen && activeWorkspace && (
             <motion.div
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
@@ -80,12 +88,15 @@ export default function Sidebar() {
                     className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-all duration-150
                       ${activeWorkspace._id === ws._id ? 'bg-bronze/10 text-bone' : 'text-olive hover:text-bone hover:bg-surface-2'}`}
                   >
-                    <span className="text-base">{ws.icon || '🏢'}</span>
+                    <span className="text-base">{ws.icon || '📁'}</span>
                     <span className="font-medium truncate">{ws.name}</span>
                     {activeWorkspace._id === ws._id && <div className="ml-auto w-1.5 h-1.5 rounded-full bg-bronze" />}
                   </button>
                 ))}
-                <button className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-olive hover:text-bone hover:bg-surface-2 transition-all duration-150">
+                <button
+                  onClick={() => { setWsOpen(false); navigate('/workspace'); }}
+                  className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-olive hover:text-bone hover:bg-surface-2 transition-all duration-150"
+                >
                   <RiAddLine className="text-base" />
                   <span>New Workspace</span>
                 </button>
@@ -116,8 +127,8 @@ export default function Sidebar() {
         <div className="pt-3 border-t border-border mt-3">
           <p className="px-3 text-xs font-semibold text-olive/60 uppercase tracking-wider mb-2">Workspace</p>
           <NavLink to="/workspace" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
-            <span className="text-base">{activeWorkspace.icon || '🏢'}</span>
-            <span className="truncate">{activeWorkspace.name}</span>
+            <span className="text-base">{activeWorkspace?.icon || '📁'}</span>
+            <span className="truncate">{activeWorkspace?.name || 'My Workspace'}</span>
           </NavLink>
         </div>
       </nav>

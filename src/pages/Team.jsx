@@ -1,19 +1,42 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import workspaceService from '../services/workspaceService';
 import { Avatar } from '../components/ui/Avatar';
-import { RiMailSendLine, RiUserAddLine, RiSearchLine, RiMore2Fill } from 'react-icons/ri';
+import EmptyState from '../components/ui/EmptyState';
+import { RiMailSendLine, RiUserAddLine, RiSearchLine, RiMore2Fill, RiTeamLine } from 'react-icons/ri';
 
 export default function Team() {
   const { activeWorkspace, loadWorkspaces, showToast } = useApp();
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [inviteEmail, setInviteEmail] = useState('');
   const [inviteRole, setInviteRole] = useState('Developer');
   const [invitedList, setInvitedList] = useState([]);
   const [showInviteModal, setShowInviteModal] = useState(false);
 
-  if (!activeWorkspace) return null;
+  // No workspace yet — show actionable empty state instead of blank
+  if (!activeWorkspace) {
+    return (
+      <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="max-w-5xl mx-auto">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+          <div>
+            <h1 className="page-title">Team Collaboration</h1>
+            <p className="text-sm text-olive mt-0.5">Manage your organization's team members and roles.</p>
+          </div>
+        </div>
+        <div className="card">
+          <EmptyState
+            icon={<RiTeamLine />}
+            title="No Workspace Selected"
+            description="Create or select a workspace first to manage team members and send invitations."
+            action={{ label: 'Go to Workspaces', onClick: () => navigate('/workspace') }}
+          />
+        </div>
+      </motion.div>
+    );
+  }
 
   const members = (activeWorkspace.members || []).map(m => ({
     ...(m.user || m),

@@ -1,5 +1,5 @@
 /* eslint-disable react-refresh/only-export-components */
-import { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import authService from '../services/authService';
 import workspaceService from '../services/workspaceService';
 import projectService from '../services/projectService';
@@ -20,33 +20,40 @@ const tasksToColumns = (taskArray) => ({
 
 export function AppProvider({ children }) {
   // ── Auth state ─────────────────────────────────────────────────────────────
-  const [currentUser, setCurrentUser]     = useState(authService.getStoredUser());
-  const [authLoading, setAuthLoading]     = useState(true);
+  const [currentUser, setCurrentUser]       = useState(authService.getStoredUser());
+  const [authLoading, setAuthLoading]       = useState(true);
 
   // ── Workspace/Project/Task state ───────────────────────────────────────────
-  const [workspaces, setWorkspaces]         = useState([]);
+  const [workspaces, setWorkspaces]           = useState([]);
   const [activeWorkspace, setActiveWorkspace] = useState(null);
-  const [projects, setProjects]             = useState([]);
-  const [activeProject, setActiveProject]   = useState(null);
-  const [tasks, setTasks]                   = useState({ backlog: [], todo: [], inprogress: [], review: [], done: [] });
-  const [allTasks, setAllTasks]             = useState([]); // flat list for calendar/profile
+  const [projects, setProjects]               = useState([]);
+  const [activeProject, setActiveProject]     = useState(null);
+  const [tasks, setTasks]                     = useState({ backlog: [], todo: [], inprogress: [], review: [], done: [] });
+  const [allTasks, setAllTasks]               = useState([]);
 
   // ── Notifications ──────────────────────────────────────────────────────────
   const [notifications, setNotifications] = useState([]);
 
   // ── UI state ───────────────────────────────────────────────────────────────
-  const [selectedTask, setSelectedTask]     = useState(null);
+  const [selectedTask, setSelectedTask]       = useState(null);
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
-  const [sidebarOpen, setSidebarOpen]       = useState(false);
-  const [loading, setLoading]               = useState({ workspace: false, project: false, tasks: false });
-  const [error]                             = useState(null);
+  const [sidebarOpen, setSidebarOpen]         = useState(false);
+  const [loading, setLoading]                 = useState({ workspace: false, project: false, tasks: false });
+  const [error, setError]                     = useState(null);
 
   // ── Toast ──────────────────────────────────────────────────────────────────
-  const [toast, setToast] = useState(null); // { message, type: 'success'|'error' }
+  const [toast, setToast] = useState(null);
   const showToast = useCallback((message, type = 'success') => {
     setToast({ message, type });
     setTimeout(() => setToast(null), 3500);
   }, []);
+
+  // Refs to avoid stale closure deps without causing re-render loops
+  const activeWorkspaceRef = useRef(null);
+  const activeProjectRef   = useRef(null);
+
+  useEffect(() => { activeWorkspaceRef.current = activeWorkspace; }, [activeWorkspace]);
+  useEffect(() => { activeProjectRef.current   = activeProject;   }, [activeProject]);
 
   // ─────────────────────────────────────────────────────────────────────────
   // Auth helpers
@@ -71,7 +78,11 @@ export function AppProvider({ children }) {
     setActiveWorkspace(null);
     setProjects([]);
     setTasks({ backlog: [], todo: [], inprogress: [], review: [], done: [] });
+    setAllTasks([]);
     setNotifications([]);
+    setError(null);
+    activeWorkspaceRef.current = null;
+    activeProjectRef.current   = null;
   };
 
   const updateCurrentUser = (user) => {
@@ -80,7 +91,7 @@ export function AppProvider({ children }) {
   };
 
   // ─────────────────────────────────────────────────────────────────────────
-  // Bootstrap: restore session + load workspaces
+  // Bootstrap: restore session
   // ─────────────────────────────────────────────────────────────────────────
   useEffect(() => {
     const init = async () => {
@@ -94,50 +105,54 @@ export function AppProvider({ children }) {
       } catch {
         authService.logout();
         setCurrentUser(null);
+      } finally {
         setAuthLoading(false);
-        return;
       }
-      setAuthLoading(false);
     };
     init();
   }, []);
 
-  // ── Data loading helpers (memoized with useCallback) ────────────────────────
+  // ─────────────────────────────────────────────────────────────────────────
+  // Data loading helpers
+  // NOTE: loadWorkspaces does NOT depend on activeWorkspace — it reads from
+  //       the ref to avoid an infinite loop (set ws → set activeWs → reload).
+  // ─────────────────────────────────────────────────────────────────────────
   const loadWorkspaces = useCallback(async () => {
     try {
       setLoading(l => ({ ...l, workspace: true }));
       const ws = await workspaceService.getAll();
       setWorkspaces(ws);
-      if (ws.length > 0 && !activeWorkspace) {
+      // Only auto-select the first workspace if none is currently active
+      if (ws.length > 0 && !activeWorkspaceRef.current) {
         setActiveWorkspace(ws[0]);
       }
     } catch (e) {
       showToast(e.message, 'error');
+      setError(e.message);
     } finally {
       setLoading(l => ({ ...l, workspace: false }));
     }
-  }, [activeWorkspace, showToast]);
+  }, [showToast]); // ← no activeWorkspace dep → stable reference
 
   const loadNotifications = useCallback(async () => {
     try {
       const data = await notificationService.getAll();
       setNotifications(data.notifications || []);
     } catch {
-      // silent
+      // silent — not critical
     }
   }, []);
 
   const loadProjects = useCallback(async (workspaceId) => {
+    if (!workspaceId) return;
     try {
       setLoading(l => ({ ...l, project: true }));
       const ps = await projectService.getByWorkspace(workspaceId);
       setProjects(ps);
+      // Only auto-select the first project if none is active in this workspace
       if (ps.length > 0) {
-        // Only set active project if none is active or if the active one doesn't belong to the new workspace
-        const hasActiveInNew = ps.some(p => p._id === activeProject?._id);
-        if (!hasActiveInNew) {
-          setActiveProject(ps[0]);
-        }
+        const hasActiveInNew = ps.some(p => p._id === activeProjectRef.current?._id);
+        if (!hasActiveInNew) setActiveProject(ps[0]);
       } else {
         setActiveProject(null);
       }
@@ -146,13 +161,14 @@ export function AppProvider({ children }) {
     } finally {
       setLoading(l => ({ ...l, project: false }));
     }
-  }, [activeProject?._id, showToast]);
+  }, [showToast]); // ← stable reference
 
   const loadWorkspaceTasks = useCallback(async (workspaceId) => {
+    if (!workspaceId) return;
     try {
       setLoading(l => ({ ...l, tasks: true }));
       const ts = await taskService.getByWorkspace(workspaceId);
-      setAllTasks(ts);
+      setAllTasks(Array.isArray(ts) ? ts : []);
     } catch (e) {
       showToast(e.message, 'error');
     } finally {
@@ -161,43 +177,35 @@ export function AppProvider({ children }) {
   }, [showToast]);
 
   const loadTasks = useCallback(async () => {
-    if (activeWorkspace) {
-      await loadWorkspaceTasks(activeWorkspace._id);
+    if (activeWorkspaceRef.current) {
+      await loadWorkspaceTasks(activeWorkspaceRef.current._id);
     }
-  }, [activeWorkspace, loadWorkspaceTasks]);
+  }, [loadWorkspaceTasks]);
 
-  // ── Bootstrap & Effects ─────────────────────────────────────────────────────
+  // ─────────────────────────────────────────────────────────────────────────
+  // Effects
+  // ─────────────────────────────────────────────────────────────────────────
 
-  // Load workspaces + connect socket after currentUser is set
+  // Load workspaces + connect socket once user is known
   useEffect(() => {
     if (!currentUser) return;
-    Promise.resolve().then(() => {
-      loadWorkspaces();
-      loadNotifications();
-    });
-    // Connect socket then join personal room
+    loadWorkspaces();
+    loadNotifications();
+
     const socket = socketService.connect();
     if (socket) {
-      // Wait for connection before joining rooms
       const doJoin = () => socketService.joinUser(currentUser._id);
-      if (socket.connected) {
-        doJoin();
-      } else {
-        socket.once('connect', doJoin);
-      }
+      if (socket.connected) doJoin();
+      else socket.once('connect', doJoin);
     }
-    return () => {
-      // Cleanup personal room listener on user change
-    };
   }, [currentUser, loadWorkspaces, loadNotifications]);
 
-  // Load projects and tasks when activeWorkspace changes
+  // Load projects + tasks when activeWorkspace changes
   useEffect(() => {
     if (!activeWorkspace) return;
-    Promise.resolve().then(() => {
-      loadProjects(activeWorkspace._id);
-      loadWorkspaceTasks(activeWorkspace._id);
-    });
+    loadProjects(activeWorkspace._id);
+    loadWorkspaceTasks(activeWorkspace._id);
+
     const socket = socketService.getSocket();
     if (socket?.connected) {
       socketService.joinWorkspace(activeWorkspace._id);
@@ -209,25 +217,22 @@ export function AppProvider({ children }) {
   // Derive column-grouped tasks when activeProject or allTasks changes
   useEffect(() => {
     if (!activeProject) {
-      Promise.resolve().then(() => {
-        setTasks({ backlog: [], todo: [], inprogress: [], review: [], done: [] });
-      });
+      setTasks({ backlog: [], todo: [], inprogress: [], review: [], done: [] });
       return;
     }
     socketService.joinProject(activeProject._id);
-    const projTasks = allTasks.filter(t => (t.project?._id || t.project) === activeProject._id);
-    Promise.resolve().then(() => {
-      setTasks(tasksToColumns(projTasks));
-    });
+    const projTasks = allTasks.filter(
+      t => (t.project?._id || t.project) === activeProject._id
+    );
+    setTasks(tasksToColumns(projTasks));
   }, [activeProject, allTasks]);
 
   // ─────────────────────────────────────────────────────────────────────────
-  // Socket.IO real-time listeners — bound once when user is present
+  // Socket real-time listeners
   // ─────────────────────────────────────────────────────────────────────────
   useEffect(() => {
     if (!currentUser) return;
 
-    // Wait a tick to ensure socket is established after connect
     const attachListeners = () => {
       const socket = socketService.getSocket();
       if (!socket) return;
@@ -260,41 +265,36 @@ export function AppProvider({ children }) {
         showToast(notif.message, 'success');
       };
 
-      const off1 = socketService.on('task_created', handleTaskCreated);
-      const off2 = socketService.on('task_updated', handleTaskUpdated);
-      const off3 = socketService.on('task_moved', handleTaskMoved);
-      const off4 = socketService.on('task_assigned', handleTaskUpdated);
+      const off1 = socketService.on('task_created',      handleTaskCreated);
+      const off2 = socketService.on('task_updated',      handleTaskUpdated);
+      const off3 = socketService.on('task_moved',        handleTaskMoved);
+      const off4 = socketService.on('task_assigned',     handleTaskUpdated);
       const off5 = socketService.on('notification_created', handleNotification);
 
       return () => { off1(); off2(); off3(); off4(); off5(); };
     };
 
-    // If socket already connected, attach now; otherwise wait for connect event
     const socket = socketService.getSocket();
     if (socket?.connected) {
-      const cleanup = attachListeners();
-      return cleanup;
+      return attachListeners();
     } else if (socket) {
       let cleanup;
       socket.once('connect', () => { cleanup = attachListeners(); });
       return () => { if (cleanup) cleanup(); };
     }
-  }, [currentUser, showToast]); // stable single-slot dep
+  }, [currentUser, showToast]);
 
   // ─────────────────────────────────────────────────────────────────────────
-  // Task actions (optimistic + persist)
+  // Task actions
   // ─────────────────────────────────────────────────────────────────────────
   const moveTask = async (taskId, fromCol, toCol) => {
     if (fromCol === toCol) return;
-    // Optimistic update of allTasks
     setAllTasks(prev =>
       prev.map(t => (t._id === taskId || t.id === taskId) ? { ...t, status: toCol } : t)
     );
-
     try {
       await taskService.updateStatus(taskId, toCol);
     } catch (e) {
-      // Revert on failure
       setAllTasks(prev =>
         prev.map(t => (t._id === taskId || t.id === taskId) ? { ...t, status: fromCol } : t)
       );

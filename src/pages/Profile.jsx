@@ -2,12 +2,19 @@ import { motion } from 'framer-motion';
 import { useApp } from '../context/AppContext';
 import { Avatar } from '../components/ui/Avatar';
 import { PriorityBadge } from '../components/ui/Badge';
-import { RiAwardLine, RiCheckboxCircleLine, RiTimeLine, RiGitMergeLine, RiCalendarCheckLine } from 'react-icons/ri';
+import { RiAwardLine, RiCheckboxCircleLine, RiTimeLine, RiGitMergeLine, RiCalendarCheckLine, RiLoader4Line } from 'react-icons/ri';
 
 export default function Profile() {
-  const { currentUser, allTasks, projects, openTask } = useApp();
+  const { currentUser, authLoading, allTasks, projects, openTask } = useApp();
 
-  if (!currentUser) return null;
+  // Show spinner while session is restoring — never go blank
+  if (authLoading || !currentUser) {
+    return (
+      <div className="flex items-center justify-center py-24">
+        <RiLoader4Line className="animate-spin text-3xl text-olive" />
+      </div>
+    );
+  }
 
   // Tasks calculations
   const assignedTasks = allTasks.filter(t => (t.assignee?._id || t.assignee) === currentUser._id);

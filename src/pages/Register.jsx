@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useApp } from '../context/AppContext';
-import { RiFlowChart, RiMailLine, RiLockLine, RiUserLine, RiEyeLine, RiEyeOffLine, RiGoogleLine, RiArrowRightLine } from 'react-icons/ri';
+import Logo from '../components/ui/Logo';
+import { RiMailLine, RiLockLine, RiUserLine, RiEyeLine, RiEyeOffLine, RiGoogleLine, RiArrowRightLine } from 'react-icons/ri';
 
 export default function Register() {
   const navigate = useNavigate();
@@ -41,12 +42,10 @@ export default function Register() {
 
       <div className="w-full max-w-md relative z-10">
         <motion.div initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }}
-          className="flex items-center justify-center gap-2.5 mb-10"
+          className="flex flex-col items-center justify-center gap-4 mb-10"
         >
-          <div className="w-10 h-10 rounded-xl bg-bronze flex items-center justify-center shadow-glow">
-            <RiFlowChart className="text-floral text-xl" />
-          </div>
-          <span className="text-floral font-bold text-xl tracking-tight">FlowForge</span>
+          <Logo size="lg" />
+          <p className="text-sm text-olive">Forge Ideas Into Reality</p>
         </motion.div>
 
         <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}

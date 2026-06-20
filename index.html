@@ -2,13 +2,28 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Primary favicon (SVG — scales perfectly) -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <!-- PNG fallbacks for browsers that don't support SVG favicons -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <!-- Apple touch icon -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <!-- Theme color for browser chrome -->
+    <meta name="theme-color" content="#11120D" />
+    <meta name="msapplication-TileColor" content="#11120D" />
+
     <title>FlowForge — Premium Collaborative Project Management</title>
     <meta name="description" content="FlowForge is a premium, minimal, and calm collaborative project management dashboard designed for modern productivity teams." />
+    <meta property="og:title" content="FlowForge" />
+    <meta property="og:description" content="Forge Ideas Into Reality — Premium project management for modern teams." />
+    <meta property="og:type" content="website" />
   </head>
   <body class="bg-smoky text-bone antialiased">
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
+

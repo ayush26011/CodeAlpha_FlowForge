@@ -4,10 +4,11 @@ import { motion } from 'framer-motion';
 import { useApp } from '../context/AppContext';
 import userService from '../services/userService';
 import workspaceService from '../services/workspaceService';
+import EmptyState from '../components/ui/EmptyState';
 import {
   RiSettings3Line, RiShieldLine, RiNotification3Line,
   RiPaletteLine, RiLogoutBoxLine, RiUserLine, RiLockLine,
-  RiUploadCloud2Line, RiGlobalLine, RiSmartphoneLine,
+  RiUploadCloud2Line, RiGlobalLine, RiSmartphoneLine, RiLoader4Line,
 } from 'react-icons/ri';
 
 // Sliding Toggle component for premium design
@@ -121,7 +122,14 @@ export default function Settings() {
     }
   }, [activeWorkspace]);
 
-  if (!currentUser || !activeWorkspace) return null;
+  // Show spinner while auth is restoring — never blank
+  if (!currentUser) {
+    return (
+      <div className="flex items-center justify-center py-24">
+        <RiLoader4Line className="animate-spin text-3xl text-olive" />
+      </div>
+    );
+  }
 
   const handleLogout = () => {
     logout();
@@ -396,30 +404,39 @@ export default function Settings() {
 
           {/* Workspace Tab */}
           {activeTab === 'workspace' && (
-            <div className="space-y-4">
-              <h2 className="section-title">Workspace Configuration</h2>
-              <div>
-                <label className="label">Workspace Name</label>
-                <input
-                  type="text"
-                  value={wsName}
-                  onChange={e => setWsName(e.target.value)}
-                  className="input"
-                />
+            activeWorkspace ? (
+              <div className="space-y-4">
+                <h2 className="section-title">Workspace Configuration</h2>
+                <div>
+                  <label className="label">Workspace Name</label>
+                  <input
+                    type="text"
+                    value={wsName}
+                    onChange={e => setWsName(e.target.value)}
+                    className="input"
+                  />
+                </div>
+                <div>
+                  <label className="label">Description</label>
+                  <textarea
+                    value={wsDesc}
+                    onChange={e => setWsDesc(e.target.value)}
+                    rows="3"
+                    className="input resize-none"
+                  />
+                </div>
+                <div className="pt-2">
+                  <button onClick={handleUpdateWorkspace} className="btn-primary text-xs cursor-pointer">Update Workspace</button>
+                </div>
               </div>
-              <div>
-                <label className="label">Description</label>
-                <textarea
-                  value={wsDesc}
-                  onChange={e => setWsDesc(e.target.value)}
-                  rows="3"
-                  className="input resize-none"
-                />
-              </div>
-              <div className="pt-2">
-                <button onClick={handleUpdateWorkspace} className="btn-primary text-xs cursor-pointer">Update Workspace</button>
-              </div>
-            </div>
+            ) : (
+              <EmptyState
+                icon="🗂️"
+                title="No Workspace Selected"
+                description="Create or select a workspace to configure its settings."
+                action={{ label: 'Go to Workspaces', onClick: () => navigate('/workspace') }}
+              />
+            )
           )}
 
           {/* Privacy Tab */}

@@ -1,0 +1,6 @@
+<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180' viewBox='0 0 180 180'>
+  <rect width='180' height='180' rx='40' fill='#11120D'/>
+  <path d='M20 32H79v22H42v28H73v22H42v70H20V32Z' fill='#C9A55A'/>
+  <path d='M95 32H155v22H118v28H149v22H118V70H95V32Z' fill='#C9A55A'/>
+  <rect x='20' y='84' width='140' height='22' rx='11' fill='#C9A55A' opacity='0.35'/>
+</svg>
