@@ -37,122 +37,138 @@ export default function Register() {
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4 py-12 relative overflow-hidden" style={{ background: '#0E0F0B' }}>
+      
+      {/* Visual background details */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-0 right-1/4 w-[500px] h-[500px] rounded-full blur-[120px] opacity-20"
-          style={{ background: 'radial-gradient(circle, rgba(155,130,96,0.4) 0%, transparent 70%)' }} />
-        <div className="absolute bottom-0 left-1/4 w-[400px] h-[400px] rounded-full blur-[100px] opacity-15"
-          style={{ background: 'radial-gradient(circle, rgba(86,84,73,0.5) 0%, transparent 70%)' }} />
-        <div className="absolute inset-0 opacity-[0.03]"
-          style={{ backgroundImage: 'linear-gradient(rgba(216,207,188,0.8) 1px, transparent 1px), linear-gradient(90deg, rgba(216,207,188,0.8) 1px, transparent 1px)', backgroundSize: '60px 60px' }} />
+        <div className="absolute top-0 right-1/4 w-[500px] h-[500px] rounded-full blur-[130px] opacity-[0.15]"
+          style={{ background: 'radial-gradient(circle, rgba(184,151,90,0.3) 0%, transparent 70%)' }} />
+        <div className="absolute bottom-0 left-1/4 w-[450px] h-[450px] rounded-full blur-[110px] opacity-[0.12]"
+          style={{ background: 'radial-gradient(circle, rgba(86,84,73,0.4) 0%, transparent 70%)' }} />
+        <div className="absolute inset-0 opacity-[0.025]"
+          style={{
+            backgroundImage: 'linear-gradient(rgba(216,207,188,0.8) 1px, transparent 1px), linear-gradient(90deg, rgba(216,207,188,0.8) 1px, transparent 1px)',
+            backgroundSize: '40px 40px',
+          }}
+        />
+
+        {/* Isometric SVG geometric lines overlay */}
+        <svg className="absolute bottom-[15%] left-[8%] w-[280px] h-[280px] opacity-[0.05] text-bone" fill="none" stroke="currentColor" viewBox="0 0 100 100">
+          <circle cx="50" cy="50" r="35" strokeWidth="0.5" />
+          <polygon points="50,15 85,75 15,75" strokeWidth="0.5" strokeDasharray="2 2" />
+          <line x1="15" y1="75" x2="85" y2="75" strokeWidth="0.5" />
+        </svg>
       </div>
 
-      <div className="w-full max-w-sm relative z-10">
+      <div className="w-full max-w-sm relative z-10 space-y-6">
         <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}
-          className="flex flex-col items-center justify-center gap-3 mb-8"
+          className="flex flex-col items-center justify-center gap-2 mb-4"
         >
           <Logo size="lg" />
-          <p className="text-xs text-olive/70 tracking-widest uppercase">Forge Ideas Into Reality</p>
+          <p className="text-3xs text-olive uppercase tracking-widest font-bold">Forge Ideas Into Reality</p>
         </motion.div>
 
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08, duration: 0.4 }}
-          className="rounded-2xl p-7"
+        {/* Floating Glass Register Panel */}
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.06, duration: 0.4 }}
+          className="rounded-2xl p-7 border relative overflow-hidden"
           style={{
             background: 'rgba(22,23,16,0.8)',
-            backdropFilter: 'blur(24px) saturate(1.5)',
-            border: '1px solid rgba(42,44,34,0.9)',
-            boxShadow: '0 24px 80px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.06)',
+            backdropFilter: 'blur(20px)',
+            borderColor: 'rgba(86,84,73,0.18)',
+            boxShadow: '0 24px 60px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.04)',
           }}
         >
-          <h2 className="text-2xl font-bold text-floral mb-1">Create account</h2>
-          <p className="text-sm text-olive mb-8">Start your free workspace today</p>
+          <div className="space-y-1 mb-6">
+            <h2 className="text-xl font-bold text-floral tracking-tight">Create Account</h2>
+            <p className="text-xs text-olive">Start your premium workspace today</p>
+          </div>
 
           {errors.api && (
-            <div className="mb-4 px-4 py-3 rounded-xl bg-red-900/20 border border-red-800/30 text-red-400 text-sm">
+            <div className="mb-4 px-3 py-2.5 rounded-xl bg-red-950/20 border border-red-800/30 text-red-400 text-xs font-semibold">
               {errors.api}
             </div>
           )}
 
-          <button className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl bg-surface-2 border border-border text-bone text-sm font-medium hover:bg-surface-3 transition-all duration-200 mb-6">
-            <RiGoogleLine className="text-lg" />
+          <button className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-surface-2 border border-white/5 text-bone text-xs font-bold hover:bg-white/5 transition-all duration-200 mb-5">
+            <RiGoogleLine className="text-base text-olive" />
             Sign up with Google
           </button>
 
-          <div className="flex items-center gap-3 mb-6">
-            <div className="flex-1 h-px bg-border" />
-            <span className="text-xs text-olive">or with email</span>
-            <div className="flex-1 h-px bg-border" />
+          <div className="flex items-center gap-3 mb-5">
+            <div className="flex-1 h-px bg-white/5" />
+            <span className="text-3xs text-olive uppercase tracking-wider font-bold">or register with email</span>
+            <div className="flex-1 h-px bg-white/5" />
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Name */}
             <div>
-              <label className="label">Full name</label>
+              <label className="text-[10px] font-bold text-olive uppercase tracking-wider mb-1.5 block">Full Name</label>
               <div className="relative">
-                <RiUserLine className="absolute left-3.5 top-1/2 -translate-y-1/2 text-olive" />
+                <RiUserLine className="absolute left-3.5 top-1/2 -translate-y-1/2 text-olive/60" />
                 <input value={form.name} onChange={set('name')} placeholder="Your name"
-                  className={`input pl-10 ${errors.name ? 'border-red-700 focus:border-red-600' : ''}`}
+                  className={`input pl-10 text-xs py-2.5 ${errors.name ? 'border-red-900/50' : ''}`}
                 />
               </div>
-              {errors.name && <p className="text-xs text-red-400 mt-1">{errors.name}</p>}
+              {errors.name && <p className="text-[10px] text-red-400 mt-1 font-semibold">{errors.name}</p>}
             </div>
 
             {/* Email */}
             <div>
-              <label className="label">Email address</label>
+              <label className="text-[10px] font-bold text-olive uppercase tracking-wider mb-1.5 block">Email address</label>
               <div className="relative">
-                <RiMailLine className="absolute left-3.5 top-1/2 -translate-y-1/2 text-olive" />
+                <RiMailLine className="absolute left-3.5 top-1/2 -translate-y-1/2 text-olive/60" />
                 <input type="email" value={form.email} onChange={set('email')} placeholder="you@company.com"
-                  className={`input pl-10 ${errors.email ? 'border-red-700 focus:border-red-600' : ''}`}
+                  className={`input pl-10 text-xs py-2.5 ${errors.email ? 'border-red-900/50' : ''}`}
                 />
               </div>
-              {errors.email && <p className="text-xs text-red-400 mt-1">{errors.email}</p>}
+              {errors.email && <p className="text-[10px] text-red-400 mt-1 font-semibold">{errors.email}</p>}
             </div>
 
             {/* Password */}
             <div>
-              <label className="label">Password</label>
+              <label className="text-[10px] font-bold text-olive uppercase tracking-wider mb-1.5 block">Password</label>
               <div className="relative">
-                <RiLockLine className="absolute left-3.5 top-1/2 -translate-y-1/2 text-olive" />
+                <RiLockLine className="absolute left-3.5 top-1/2 -translate-y-1/2 text-olive/60" />
                 <input type={showPw ? 'text' : 'password'} value={form.password} onChange={set('password')}
                   placeholder="Min 8 characters"
-                  className={`input pl-10 pr-10 ${errors.password ? 'border-red-700 focus:border-red-600' : ''}`}
+                  className={`input pl-10 pr-10 text-xs py-2.5 ${errors.password ? 'border-red-900/50' : ''}`}
                 />
                 <button type="button" onClick={() => setShowPw(s => !s)}
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-olive hover:text-bone"
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-olive/70 hover:text-bone"
                 >
                   {showPw ? <RiEyeOffLine /> : <RiEyeLine />}
                 </button>
               </div>
-              {errors.password && <p className="text-xs text-red-400 mt-1">{errors.password}</p>}
+              {errors.password && <p className="text-[10px] text-red-400 mt-1 font-semibold">{errors.password}</p>}
             </div>
 
             {/* Confirm */}
             <div>
-              <label className="label">Confirm password</label>
+              <label className="text-[10px] font-bold text-olive uppercase tracking-wider mb-1.5 block">Confirm password</label>
               <div className="relative">
-                <RiLockLine className="absolute left-3.5 top-1/2 -translate-y-1/2 text-olive" />
+                <RiLockLine className="absolute left-3.5 top-1/2 -translate-y-1/2 text-olive/60" />
                 <input type="password" value={form.confirm} onChange={set('confirm')} placeholder="Repeat password"
-                  className={`input pl-10 ${errors.confirm ? 'border-red-700 focus:border-red-600' : ''}`}
+                  className={`input pl-10 text-xs py-2.5 ${errors.confirm ? 'border-red-900/50' : ''}`}
                 />
               </div>
-              {errors.confirm && <p className="text-xs text-red-400 mt-1">{errors.confirm}</p>}
+              {errors.confirm && <p className="text-[10px] text-red-400 mt-1 font-semibold">{errors.confirm}</p>}
             </div>
 
-            <p className="text-xs text-olive">
-              By signing up you agree to our{' '}
-              <a href="#" className="text-bronze">Terms of Service</a> and{' '}
-              <a href="#" className="text-bronze">Privacy Policy</a>.
+            <p className="text-[10px] text-olive/70 leading-relaxed pt-1">
+              By creating an account, you agree to our{' '}
+              <a href="#" className="text-bronze hover:underline font-semibold">Terms</a> and{' '}
+              <a href="#" className="text-bronze hover:underline font-semibold">Privacy Policy</a>.
             </p>
 
-            <button type="submit" className="w-full btn-primary py-3 justify-center text-base">
+            <button type="submit" className="w-full btn-primary py-2.5 justify-center text-xs uppercase tracking-wider font-bold">
               Create Account
-              <RiArrowRightLine />
+              <RiArrowRightLine className="text-sm" />
             </button>
           </form>
 
-          <p className="text-center text-sm text-olive mt-6">
+          <p className="text-center text-xs text-olive mt-6">
             Already have an account?{' '}
-            <Link to="/login" className="text-bronze hover:text-bronze-light transition-colors font-medium">Sign in</Link>
+            <Link to="/login" className="text-bronze hover:underline font-bold transition-all">Sign in</Link>
           </p>
         </motion.div>
       </div>

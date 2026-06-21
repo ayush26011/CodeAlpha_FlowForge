@@ -14,20 +14,20 @@ import {
 // Sliding Toggle component for premium design
 function Toggle({ checked, onChange, label, sub }) {
   return (
-    <div className="flex items-center justify-between p-3 rounded-xl bg-surface-2/40 hover:bg-surface-2/80 transition-all">
+    <div className="flex items-center justify-between p-3.5 rounded-xl border border-white/5 bg-white/2 hover:bg-white/5 transition-all">
       <div className="min-w-0 mr-4">
-        <p className="text-sm font-medium text-bone truncate">{label}</p>
-        {sub && <p className="text-xs text-olive mt-0.5">{sub}</p>}
+        <p className="text-xs font-semibold text-bone truncate">{label}</p>
+        {sub && <p className="text-2xs text-olive/85 mt-0.5">{sub}</p>}
       </div>
       <button
         type="button"
         onClick={() => onChange(!checked)}
-        className={`w-11 h-6 rounded-full transition-colors relative flex items-center flex-shrink-0 cursor-pointer
-          ${checked ? 'bg-bronze' : 'bg-surface-3 border border-border'}`}
+        className={`w-10 h-5.5 rounded-full transition-colors relative flex items-center flex-shrink-0 cursor-pointer
+          ${checked ? 'bg-bronze' : 'bg-surface-3 border border-olive/20'}`}
       >
         <div
-          className={`w-4 h-4 rounded-full bg-floral transition-transform absolute left-1
-            ${checked ? 'translate-x-5' : 'translate-x-0'}`}
+          className={`w-3.5 h-3.5 rounded-full bg-floral transition-transform absolute left-0.5
+            ${checked ? 'translate-x-4.5' : 'translate-x-0'}`}
         />
       </button>
     </div>
@@ -122,7 +122,6 @@ export default function Settings() {
     }
   }, [activeWorkspace]);
 
-  // Show spinner while auth is restoring — never blank
   if (!currentUser) {
     return (
       <div className="flex items-center justify-center py-24">
@@ -253,52 +252,53 @@ export default function Settings() {
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      className="max-w-4xl mx-auto space-y-6"
+      className="max-w-4xl mx-auto space-y-6 pb-12"
     >
       <div className="flex items-center gap-3">
-        <RiSettings3Line className="text-bronze text-2xl" />
-        <h1 className="page-title">Settings</h1>
+        <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-white/5 border border-white/10">
+          <RiSettings3Line className="text-bronze-light text-base" />
+        </div>
+        <h1 className="page-title text-base font-bold text-floral">Settings</h1>
       </div>
 
       <div className="grid md:grid-cols-4 gap-6">
-        {/* Left Side Tabs */}
+        {/* Navigation Selector segments */}
         <div className="md:col-span-1 flex flex-col gap-1">
           {tabs.map(tab => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all cursor-pointer
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer text-left
                 ${activeTab === tab.id
-                  ? 'bg-surface-3 text-bone shadow-card'
-                  : 'text-olive hover:text-bone hover:bg-surface-2'}`}
+                  ? 'bg-surface text-bone border border-white/5 shadow-xs font-bold'
+                  : 'text-olive hover:text-bone hover:bg-white/5 border border-transparent'}`}
             >
-              <tab.icon className="text-lg" />
+              <tab.icon className="text-base" />
               <span>{tab.label}</span>
             </button>
           ))}
           <button
             onClick={handleLogout}
-            className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-semibold text-red-400 hover:bg-red-950/20 transition-all mt-4 cursor-pointer"
+            className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold uppercase tracking-wider text-red-400 hover:bg-red-950/20 transition-all mt-4 cursor-pointer text-left"
           >
-            <RiLogoutBoxLine className="text-lg" />
+            <RiLogoutBoxLine className="text-base" />
             <span>Logout</span>
           </button>
         </div>
 
-        {/* Right Side Settings Panel */}
-        <div className="md:col-span-3 card p-6 space-y-6">
+        {/* Right Settings Detail Panels */}
+        <div className="md:col-span-3 card p-6 space-y-6" style={{ background: 'rgba(22,23,16,0.6)', backdropFilter: 'blur(8px)', borderColor: 'rgba(86,84,73,0.15)' }}>
           
-          {/* Account Tab */}
+          {/* Account Form updates */}
           {activeTab === 'account' && (
-            <div className="space-y-5">
+            <div className="space-y-6">
               <h2 className="section-title">Account Profile</h2>
               
-              {/* Avatar Upload */}
-              <div className="flex items-center gap-4 p-4 rounded-2xl bg-surface-2/20 border border-border/40">
+              <div className="flex items-center gap-4 p-4 rounded-xl bg-white/2 border border-white/5">
                 <img
                   src={currentUser.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(currentUser.name)}`}
                   alt="Avatar"
-                  className="w-16 h-16 rounded-full bg-surface-3 object-cover border border-border"
+                  className="w-14 h-14 rounded-full bg-surface-3 object-cover border border-white/10"
                   onError={e => { e.target.src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(currentUser.name)}`; }}
                 />
                 <div>
@@ -306,7 +306,7 @@ export default function Settings() {
                     type="button"
                     disabled={uploading}
                     onClick={() => fileInputRef.current?.click()}
-                    className="btn-primary text-xs flex items-center gap-1.5 cursor-pointer"
+                    className="btn-primary text-2xs uppercase tracking-wider flex items-center gap-1.5 cursor-pointer py-2"
                   >
                     <RiUploadCloud2Line className="text-sm" />
                     {uploading ? 'Uploading...' : 'Upload Image'}
@@ -318,7 +318,7 @@ export default function Settings() {
                     accept="image/*"
                     className="hidden"
                   />
-                  <p className="text-[10px] text-olive mt-1.5">Max size 5MB. Powered by Cloudinary.</p>
+                  <p className="text-[10px] text-olive/60 mt-1.5 font-medium">Max size 5MB. Powered by Cloudinary.</p>
                 </div>
               </div>
 
@@ -329,7 +329,7 @@ export default function Settings() {
                     type="text"
                     value={name}
                     onChange={e => setName(e.target.value)}
-                    className="input"
+                    className="input text-xs"
                   />
                 </div>
                 <div>
@@ -338,7 +338,7 @@ export default function Settings() {
                     type="email"
                     value={email}
                     onChange={e => setEmail(e.target.value)}
-                    className="input"
+                    className="input text-xs"
                   />
                 </div>
               </div>
@@ -351,7 +351,7 @@ export default function Settings() {
                     value={phone}
                     onChange={e => setPhone(e.target.value)}
                     placeholder="+1 (555) 000-0000"
-                    className="input"
+                    className="input text-xs"
                   />
                 </div>
                 <div>
@@ -361,7 +361,7 @@ export default function Settings() {
                     value={website}
                     onChange={e => setWebsite(e.target.value)}
                     placeholder="https://yourwebsite.com"
-                    className="input"
+                    className="input text-xs"
                   />
                 </div>
               </div>
@@ -373,7 +373,7 @@ export default function Settings() {
                   onChange={e => setBio(e.target.value)}
                   rows="3"
                   placeholder="Tell us about yourself..."
-                  className="input resize-none"
+                  className="input resize-none text-xs"
                 />
               </div>
 
@@ -382,7 +382,7 @@ export default function Settings() {
                 <select
                   value={timezone}
                   onChange={e => setTimezone(e.target.value)}
-                  className="input"
+                  className="input text-xs"
                 >
                   <option value="UTC">Coordinated Universal Time (UTC)</option>
                   <option value="America/New_York">Eastern Time (ET)</option>
@@ -397,12 +397,12 @@ export default function Settings() {
               </div>
 
               <div className="pt-2">
-                <button onClick={handleSaveProfile} className="btn-primary text-xs cursor-pointer">Save Profile Changes</button>
+                <button onClick={handleSaveProfile} className="btn-primary text-2xs uppercase tracking-wider py-2">Save Profile Changes</button>
               </div>
             </div>
           )}
 
-          {/* Workspace Tab */}
+          {/* Workspace info updates */}
           {activeTab === 'workspace' && (
             activeWorkspace ? (
               <div className="space-y-4">
@@ -413,7 +413,7 @@ export default function Settings() {
                     type="text"
                     value={wsName}
                     onChange={e => setWsName(e.target.value)}
-                    className="input"
+                    className="input text-xs"
                   />
                 </div>
                 <div>
@@ -422,11 +422,11 @@ export default function Settings() {
                     value={wsDesc}
                     onChange={e => setWsDesc(e.target.value)}
                     rows="3"
-                    className="input resize-none"
+                    className="input resize-none text-xs"
                   />
                 </div>
                 <div className="pt-2">
-                  <button onClick={handleUpdateWorkspace} className="btn-primary text-xs cursor-pointer">Update Workspace</button>
+                  <button onClick={handleUpdateWorkspace} className="btn-primary text-2xs uppercase tracking-wider py-2">Update Workspace</button>
                 </div>
               </div>
             ) : (
@@ -439,7 +439,7 @@ export default function Settings() {
             )
           )}
 
-          {/* Privacy Tab */}
+          {/* Privacy Toggle panel */}
           {activeTab === 'privacy' && (
             <div className="space-y-5">
               <h2 className="section-title">Privacy Settings</h2>
@@ -472,12 +472,12 @@ export default function Settings() {
               </div>
 
               <div className="pt-2">
-                <button onClick={handleSavePrivacy} className="btn-primary text-xs cursor-pointer">Save Privacy Preferences</button>
+                <button onClick={handleSavePrivacy} className="btn-primary text-2xs uppercase tracking-wider py-2">Save Privacy Preferences</button>
               </div>
             </div>
           )}
 
-          {/* Notifications Tab */}
+          {/* Notifications config */}
           {activeTab === 'notifications' && (
             <div className="space-y-5">
               <h2 className="section-title">Notification Preferences</h2>
@@ -522,12 +522,12 @@ export default function Settings() {
               </div>
 
               <div className="pt-2">
-                <button onClick={handleSaveNotifications} className="btn-primary text-xs cursor-pointer">Save Notification Preferences</button>
+                <button onClick={handleSaveNotifications} className="btn-primary text-2xs uppercase tracking-wider py-2">Save Notification Preferences</button>
               </div>
             </div>
           )}
 
-          {/* Appearance Tab */}
+          {/* Theme selector */}
           {activeTab === 'appearance' && (
             <div className="space-y-5">
               <h2 className="section-title">Visual Customization</h2>
@@ -539,9 +539,9 @@ export default function Settings() {
                     type="button"
                     onClick={() => setThemeMode(mode)}
                     className={`card p-4 text-center cursor-pointer capitalize border-2 transition-all
-                      ${themeMode === mode ? 'border-bronze bg-surface-2' : 'border-border hover:border-border-light'}`}
+                      ${themeMode === mode ? 'border-bronze bg-surface-2' : 'border-white/5 hover:border-white/10'}`}
                   >
-                    <p className="text-sm font-semibold text-bone">{mode}</p>
+                    <p className="text-xs font-semibold text-bone">{mode}</p>
                     <p className="text-[10px] text-olive mt-1">{mode === 'dark' ? 'Default theme' : 'Select mode'}</p>
                   </button>
                 ))}
@@ -563,7 +563,7 @@ export default function Settings() {
               </div>
 
               <div className="pt-2">
-                <button onClick={handleSaveAppearance} className="btn-primary text-xs cursor-pointer">Save Appearance settings</button>
+                <button onClick={handleSaveAppearance} className="btn-primary text-2xs uppercase tracking-wider py-2">Save Appearance settings</button>
               </div>
             </div>
           )}
@@ -581,7 +581,7 @@ export default function Settings() {
                     required
                     value={currentPassword}
                     onChange={e => setCurrentPassword(e.target.value)}
-                    className="input font-mono"
+                    className="input font-mono text-xs"
                   />
                 </div>
                 <div className="grid sm:grid-cols-2 gap-4">
@@ -592,7 +592,7 @@ export default function Settings() {
                       required
                       value={newPassword}
                       onChange={e => setNewPassword(e.target.value)}
-                      className="input font-mono"
+                      className="input font-mono text-xs"
                     />
                   </div>
                   <div>
@@ -602,16 +602,16 @@ export default function Settings() {
                       required
                       value={confirmPassword}
                       onChange={e => setConfirmPassword(e.target.value)}
-                      className="input font-mono"
+                      className="input font-mono text-xs"
                     />
                   </div>
                 </div>
                 <div className="pt-2">
-                  <button type="submit" className="btn-primary text-xs cursor-pointer">Update Account Password</button>
+                  <button type="submit" className="btn-primary text-2xs uppercase tracking-wider py-2">Update Account Password</button>
                 </div>
               </form>
 
-              <hr className="border-border" />
+              <hr className="border-white/5" />
 
               {/* Login Alerts Toggle */}
               <div className="space-y-4">
@@ -623,35 +623,35 @@ export default function Settings() {
                   sub="Receive security updates whenever a login succeeds on a new device."
                 />
                 <div className="pt-1">
-                  <button onClick={handleSaveSecurity} className="btn-primary text-xs cursor-pointer">Save Security Preferences</button>
+                  <button onClick={handleSaveSecurity} className="btn-primary text-2xs uppercase tracking-wider py-2">Save Security Preferences</button>
                 </div>
               </div>
 
-              <hr className="border-border" />
+              <hr className="border-white/5" />
 
-              {/* Saved Devices */}
+              {/* Saved Devices list */}
               <div className="space-y-4">
                 <h2 className="section-title">Authorized Devices</h2>
                 <div className="space-y-2.5">
                   {savedDevices.map((device, idx) => (
-                    <div key={idx} className="flex items-center justify-between p-3.5 rounded-xl bg-surface-2/40 border border-border/50 text-sm">
+                    <div key={idx} className="flex items-center justify-between p-3.5 rounded-xl bg-white/2 border border-white/5 text-sm">
                       <div className="flex items-center gap-3">
                         {device.includes('Mobile') ? (
-                          <RiSmartphoneLine className="text-xl text-olive" />
+                          <RiSmartphoneLine className="text-lg text-olive" />
                         ) : (
-                          <RiGlobalLine className="text-xl text-olive" />
+                          <RiGlobalLine className="text-lg text-olive" />
                         )}
                         <div>
-                          <p className="font-semibold text-bone">{device}</p>
-                          <p className="text-xs text-olive">Active Session</p>
+                          <p className="text-xs font-semibold text-bone">{device}</p>
+                          <p className="text-[10px] text-olive/60 mt-0.5 font-medium">Active Session</p>
                         </div>
                       </div>
                       {device.includes('Current') ? (
-                        <span className="text-xs font-semibold text-green-400 bg-green-950/20 px-2 py-0.5 rounded-full border border-green-500/20">Current</span>
+                        <span className="text-[10px] font-semibold text-green-400 bg-green-950/20 px-2 py-0.5 rounded-full border border-green-500/20">Current</span>
                       ) : (
                         <button
                           onClick={() => handleRemoveDevice(device)}
-                          className="text-xs font-semibold text-red-400 hover:text-red-300 transition-colors cursor-pointer"
+                          className="text-[10px] font-semibold text-red-400 hover:text-red-300 transition-colors cursor-pointer"
                         >
                           Revoke Access
                         </button>

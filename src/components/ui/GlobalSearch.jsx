@@ -5,10 +5,9 @@ import { useApp } from '../../context/AppContext';
 import {
   RiSearchLine, RiCloseLine, RiLoader4Line,
   RiKanbanView2, RiFolderLine, RiLayoutGridLine,
-  RiTeamLine, RiArrowRightUpLine, RiHistoryLine,
+  RiTeamLine
 } from 'react-icons/ri';
 
-// ── Debounce hook ─────────────────────────────────────────────────────────────
 function useDebounce(value, delay) {
   const [debounced, setDebounced] = useState(value);
   useEffect(() => {
@@ -18,13 +17,12 @@ function useDebounce(value, delay) {
   return debounced;
 }
 
-// ── Result row ────────────────────────────────────────────────────────────────
 function ResultRow({ item, onSelect, isActive }) {
   const iconMap = {
-    workspace: <RiFolderLine className="text-bronze flex-shrink-0" />,
-    project:   <RiLayoutGridLine className="text-blue-400/80 flex-shrink-0" />,
-    task:      <RiKanbanView2 className="text-emerald-400/80 flex-shrink-0" />,
-    member:    <RiTeamLine className="text-purple-400/80 flex-shrink-0" />,
+    workspace: <RiFolderLine className="text-bronze-light flex-shrink-0" />,
+    project:   <RiLayoutGridLine className="text-bronze flex-shrink-0" />,
+    task:      <RiKanbanView2 className="text-bone/70 flex-shrink-0" />,
+    member:    <RiTeamLine className="text-olive-light flex-shrink-0" />,
   };
 
   const typeLabel = {
@@ -37,10 +35,10 @@ function ResultRow({ item, onSelect, isActive }) {
   return (
     <button
       onClick={() => onSelect(item)}
-      className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-all duration-100 rounded-xl mx-1
+      className={`w-full flex items-center gap-3 px-3.5 py-2.5 text-left transition-all duration-100 rounded-xl mx-1 border
         ${isActive
-          ? 'bg-surface-3 text-bone'
-          : 'text-olive hover:bg-surface-2 hover:text-bone'
+          ? 'bg-white/5 border-white/5 text-floral'
+          : 'text-olive hover:bg-white/2 hover:text-bone border-transparent'
         }`}
       style={{ width: 'calc(100% - 8px)' }}
     >
@@ -48,19 +46,18 @@ function ResultRow({ item, onSelect, isActive }) {
         {iconMap[item.type]}
       </span>
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium text-bone truncate">{item.title}</p>
+        <p className="text-xs font-semibold text-bone truncate">{item.title}</p>
         {item.subtitle && (
-          <p className="text-xs text-olive truncate">{item.subtitle}</p>
+          <p className="text-3xs text-olive/80 truncate mt-0.5">{item.subtitle}</p>
         )}
       </div>
-      <span className="text-2xs text-olive/50 bg-surface-3 px-2 py-0.5 rounded-md flex-shrink-0">
+      <span className="text-[10px] text-olive/60 bg-white/5 px-2 py-0.5 rounded border border-white/5 flex-shrink-0 font-bold uppercase tracking-wider">
         {typeLabel[item.type]}
       </span>
     </button>
   );
 }
 
-// ── Main Search Modal ─────────────────────────────────────────────────────────
 export default function GlobalSearch({ isOpen, onClose }) {
   const { workspaces, projects, allTasks, activeWorkspace, openTask, setActiveWorkspace } = useApp();
   const navigate = useNavigate();
@@ -72,7 +69,6 @@ export default function GlobalSearch({ isOpen, onClose }) {
   const inputRef = useRef(null);
   const debouncedQuery = useDebounce(query, 200);
 
-  // Focus input when opened
   useEffect(() => {
     if (isOpen) {
       setQuery('');
@@ -82,20 +78,17 @@ export default function GlobalSearch({ isOpen, onClose }) {
     }
   }, [isOpen]);
 
-  // ⌘K / Ctrl+K global shortcut
   useEffect(() => {
     const handler = (e) => {
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
         e.preventDefault();
         if (isOpen) onClose();
-        // trigger open via parent
       }
     };
     document.addEventListener('keydown', handler);
     return () => document.removeEventListener('keydown', handler);
   }, [isOpen, onClose]);
 
-  // Run search
   useEffect(() => {
     const q = debouncedQuery.trim().toLowerCase();
     if (!q) { setResults([]); setLoading(false); return; }
@@ -103,21 +96,18 @@ export default function GlobalSearch({ isOpen, onClose }) {
     setLoading(true);
     const found = [];
 
-    // Search workspaces
     (workspaces || []).forEach(ws => {
       if (ws.name?.toLowerCase().includes(q) || ws.description?.toLowerCase().includes(q)) {
         found.push({ type: 'workspace', id: ws._id, title: ws.name, subtitle: ws.description || 'Workspace', _raw: ws });
       }
     });
 
-    // Search projects
     (projects || []).forEach(p => {
       if (p.name?.toLowerCase().includes(q) || p.description?.toLowerCase().includes(q)) {
         found.push({ type: 'project', id: p._id, title: p.name, subtitle: p.description || 'Project', _raw: p });
       }
     });
 
-    // Search tasks
     (allTasks || []).forEach(t => {
       if (t.title?.toLowerCase().includes(q) || t.description?.toLowerCase().includes(q)) {
         found.push({
@@ -130,7 +120,6 @@ export default function GlobalSearch({ isOpen, onClose }) {
       }
     });
 
-    // Search members (from active workspace)
     ((activeWorkspace?.members) || []).forEach(m => {
       const user = m.user || m;
       const name = user.name || '';
@@ -140,12 +129,11 @@ export default function GlobalSearch({ isOpen, onClose }) {
       }
     });
 
-    setResults(found.slice(0, 12)); // cap at 12
+    setResults(found.slice(0, 12));
     setLoading(false);
     setActiveIdx(0);
   }, [debouncedQuery, workspaces, projects, allTasks, activeWorkspace]);
 
-  // Handle selection
   const handleSelect = useCallback((item) => {
     onClose();
     switch (item.type) {
@@ -165,7 +153,6 @@ export default function GlobalSearch({ isOpen, onClose }) {
     }
   }, [onClose, navigate, setActiveWorkspace, openTask]);
 
-  // Keyboard navigation
   const handleKeyDown = (e) => {
     if (!results.length) return;
     if (e.key === 'ArrowDown') { e.preventDefault(); setActiveIdx(i => Math.min(i + 1, results.length - 1)); }
@@ -200,11 +187,16 @@ export default function GlobalSearch({ isOpen, onClose }) {
             exit={{ opacity: 0, scale: 0.97, y: -8 }}
             transition={{ type: 'spring', damping: 28, stiffness: 350 }}
             onClick={e => e.stopPropagation()}
-            className="w-full max-w-xl card-elevated overflow-hidden"
-            style={{ maxHeight: '70vh' }}
+            className="w-full max-w-xl border rounded-2xl overflow-hidden shadow-2xl"
+            style={{
+              maxHeight: '70vh',
+              background: 'rgba(22,23,16,0.95)',
+              backdropFilter: 'blur(20px)',
+              borderColor: 'rgba(86,84,73,0.18)',
+            }}
           >
-            {/* Search input */}
-            <div className="flex items-center gap-3 px-4 py-3.5 border-b border-border">
+            {/* Input wrap */}
+            <div className="flex items-center gap-3 px-4 py-3.5 border-b border-white/5">
               <RiSearchLine className="text-olive text-lg flex-shrink-0" />
               <input
                 ref={inputRef}
@@ -212,46 +204,42 @@ export default function GlobalSearch({ isOpen, onClose }) {
                 onChange={e => setQuery(e.target.value)}
                 onKeyDown={handleKeyDown}
                 placeholder="Search workspaces, projects, tasks, members…"
-                className="flex-1 bg-transparent text-sm text-bone placeholder-olive/50 outline-none"
+                className="flex-1 bg-transparent text-xs text-bone placeholder-olive/60 outline-none"
                 aria-label="Global search"
                 autoComplete="off"
               />
               {loading && <RiLoader4Line className="animate-spin text-olive flex-shrink-0" />}
               {query && !loading && (
-                <button onClick={() => setQuery('')} className="btn-ghost p-1">
+                <button onClick={() => setQuery('')} className="text-olive hover:text-bone p-1">
                   <RiCloseLine className="text-base" />
                 </button>
               )}
-              <kbd className="hidden sm:block text-2xs bg-surface-3 text-olive px-2 py-1 rounded-md border border-border">ESC</kbd>
+              <kbd className="hidden sm:block text-[10px] bg-white/5 text-olive px-2 py-0.5 rounded border border-white/5 font-semibold">ESC</kbd>
             </div>
 
-            {/* Results */}
+            {/* Results body */}
             <div className="overflow-y-auto column-scroll" style={{ maxHeight: 'calc(70vh - 56px)' }}>
-              {/* No query — show hint */}
               {!query && (
-                <div className="px-5 py-8 text-center">
-                  <RiSearchLine className="text-3xl text-olive/30 mx-auto mb-3" />
-                  <p className="text-sm text-olive">Search across your workspace</p>
-                  <p className="text-2xs text-olive/50 mt-1">Tasks, projects, members and more</p>
+                <div className="px-5 py-10 text-center">
+                  <RiSearchLine className="text-4xl text-olive/20 mx-auto mb-3" />
+                  <p className="text-xs text-olive font-medium">Search across your workspaces</p>
+                  <p className="text-3xs text-olive/40 mt-1 uppercase tracking-wider font-semibold">Tasks, projects, members and more</p>
                 </div>
               )}
 
-              {/* Loading */}
               {loading && (
-                <div className="px-5 py-8 flex items-center justify-center gap-2 text-olive text-sm">
+                <div className="px-5 py-8 flex items-center justify-center gap-2 text-olive text-xs font-medium">
                   <RiLoader4Line className="animate-spin" /> Searching…
                 </div>
               )}
 
-              {/* Empty */}
               {showEmpty && (
                 <div className="px-5 py-8 text-center">
-                  <p className="text-sm text-olive">No results for <span className="text-bone font-medium">"{query}"</span></p>
-                  <p className="text-2xs text-olive/50 mt-1">Try a different keyword</p>
+                  <p className="text-xs text-olive">No results for <span className="text-bone font-bold">"{query}"</span></p>
+                  <p className="text-3xs text-olive/40 mt-1 uppercase tracking-wider font-semibold">Try different terms</p>
                 </div>
               )}
 
-              {/* Grouped results */}
               {!loading && results.length > 0 && (
                 <div className="p-2 space-y-1">
                   {typeOrder.filter(t => grouped[t]).map(type => {
@@ -261,7 +249,7 @@ export default function GlobalSearch({ isOpen, onClose }) {
                     });
                     return (
                       <div key={type}>
-                        <p className="px-4 pt-3 pb-1 text-2xs font-semibold text-olive/50 uppercase tracking-widest">
+                        <p className="px-4 pt-3 pb-1 text-[10px] font-bold text-olive/50 uppercase tracking-widest">
                           {typeLabel[type]}
                         </p>
                         {grouped[type].map((r, i) => (
@@ -278,11 +266,11 @@ export default function GlobalSearch({ isOpen, onClose }) {
                 </div>
               )}
 
-              {/* Footer tip */}
-              <div className="px-5 py-3 border-t border-border flex items-center gap-3 text-2xs text-olive/40">
-                <span className="flex items-center gap-1"><kbd className="bg-surface-3 px-1.5 py-0.5 rounded border border-border">↑↓</kbd> navigate</span>
-                <span className="flex items-center gap-1"><kbd className="bg-surface-3 px-1.5 py-0.5 rounded border border-border">↵</kbd> select</span>
-                <span className="flex items-center gap-1"><kbd className="bg-surface-3 px-1.5 py-0.5 rounded border border-border">ESC</kbd> close</span>
+              {/* Navigation help bar */}
+              <div className="px-5 py-3 border-t border-white/5 flex items-center gap-3 text-3xs text-olive/40 uppercase tracking-wider font-bold">
+                <span className="flex items-center gap-1"><kbd className="bg-white/5 px-1.5 py-0.5 rounded border border-white/5">↑↓</kbd> navigate</span>
+                <span className="flex items-center gap-1"><kbd className="bg-white/5 px-1.5 py-0.5 rounded border border-white/5">↵</kbd> select</span>
+                <span className="flex items-center gap-1"><kbd className="bg-white/5 px-1.5 py-0.5 rounded border border-white/5">ESC</kbd> close</span>
               </div>
             </div>
           </motion.div>

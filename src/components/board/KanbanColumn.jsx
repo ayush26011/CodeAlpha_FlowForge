@@ -14,32 +14,33 @@ export default function KanbanColumn({ columnId, tasks }) {
   const meta = columnMeta[columnId];
 
   return (
-    <div className="flex flex-col w-[272px] flex-shrink-0">
+    <div className="flex flex-col w-[280px] flex-shrink-0">
       {/* Column header */}
-      <div
-        className="flex items-center justify-between px-1 mb-3"
-      >
-        <div className="flex items-center gap-2">
+      <div className="flex items-center justify-between px-2 mb-3.5">
+        <div className="flex items-center gap-2.5">
           <div
             className="w-2 h-2 rounded-full flex-shrink-0"
-            style={{ background: meta.dotColor, boxShadow: `0 0 6px ${meta.dotColor}` }}
+            style={{
+              background: meta.dotColor,
+              boxShadow: `0 0 8px ${meta.dotColor}`,
+            }}
           />
-          <span className="text-xs font-semibold tracking-tight" style={{ color: meta.color }}>
+          <span className="text-xs font-bold tracking-tight uppercase" style={{ color: meta.color, letterSpacing: '0.05em' }}>
             {meta.label}
           </span>
           <span
-            className="text-2xs font-semibold px-1.5 py-0.5 rounded-md"
+            className="text-3xs font-extrabold px-1.5 py-0.5 rounded-lg border"
             style={{
-              background: 'rgba(30,32,24,0.8)',
-              border: '1px solid rgba(42,44,34,0.7)',
-              color: 'rgba(107,102,89,0.8)',
+              background: 'rgba(22,23,16,0.8)',
+              borderColor: 'rgba(86,84,73,0.15)',
+              color: 'rgba(216,207,188,0.8)',
             }}
           >
             {tasks.length}
           </span>
         </div>
         <button
-          className="flex items-center justify-center w-6 h-6 rounded-lg transition-all duration-150 text-olive/50 hover:text-bone hover:bg-surface-3"
+          className="flex items-center justify-center w-6.5 h-6.5 rounded-lg transition-all duration-150 text-olive hover:text-bone hover:bg-white/5 border border-transparent hover:border-white/5"
           aria-label={`Add task to ${meta.label}`}
         >
           <RiAddLine className="text-sm" />
@@ -52,15 +53,15 @@ export default function KanbanColumn({ columnId, tasks }) {
           <div
             ref={provided.innerRef}
             {...provided.droppableProps}
-            className="flex-1 space-y-2 min-h-[120px] rounded-xl p-1.5 transition-all duration-200 column-scroll"
+            className="flex-1 space-y-2.5 min-h-[150px] rounded-2xl p-2 transition-all duration-200 column-scroll"
             style={{
               background: snapshot.isDraggingOver
-                ? 'rgba(155,130,96,0.04)'
+                ? 'rgba(86,84,73,0.03)'
                 : 'transparent',
               outline: snapshot.isDraggingOver
-                ? '1px solid rgba(155,130,96,0.15)'
+                ? '1px dashed rgba(184,151,90,0.2)'
                 : '1px solid transparent',
-              minHeight: '120px',
+              minHeight: '150px',
             }}
           >
             {tasks.map((task, index) => (
@@ -70,10 +71,10 @@ export default function KanbanColumn({ columnId, tasks }) {
 
             {tasks.length === 0 && !snapshot.isDraggingOver && (
               <div
-                className="flex items-center justify-center h-20 rounded-xl text-2xs text-olive/30"
-                style={{ border: '1px dashed rgba(42,44,34,0.6)' }}
+                className="flex items-center justify-center h-24 rounded-2xl text-3xs text-olive/40 font-medium uppercase tracking-wider"
+                style={{ border: '1px dashed rgba(86,84,73,0.15)' }}
               >
-                Drop cards here
+                Drop tasks here
               </div>
             )}
           </div>

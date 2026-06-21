@@ -22,60 +22,53 @@ export default function TaskCard({ task, index }) {
           ref={provided.innerRef}
           {...provided.draggableProps}
           {...provided.dragHandleProps}
-          initial={{ opacity: 0, y: 6 }}
+          initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.18, delay: index * 0.03 }}
+          transition={{ duration: 0.2, delay: index * 0.02 }}
           onClick={() => openTask(task)}
-          className={`select-none cursor-pointer rounded-xl transition-all duration-150 group
-            ${snapshot.isDragging
-              ? 'rotate-[1.5deg] scale-[1.03]'
-              : ''
-            }`}
+          className={`select-none cursor-pointer rounded-xl transition-all duration-150 group border ${
+            snapshot.isDragging ? 'rotate-[1.5deg] scale-[1.02]' : ''
+          }`}
           style={{
-            background: snapshot.isDragging
-              ? 'rgba(30,32,24,0.98)'
-              : 'rgba(22,23,16,0.9)',
-            border: snapshot.isDragging
-              ? '1px solid rgba(155,130,96,0.4)'
-              : '1px solid rgba(42,44,34,0.9)',
+            ...provided.draggableProps.style,
+            background: snapshot.isDragging ? '#1E2018' : 'rgba(22,23,16,0.85)',
+            borderColor: snapshot.isDragging ? 'rgba(184,151,90,0.5)' : 'rgba(86,84,73,0.15)',
             boxShadow: snapshot.isDragging
-              ? '0 16px 40px rgba(0,0,0,0.6), 0 0 0 1px rgba(155,130,96,0.15)'
-              : '0 1px 3px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.03)',
-            padding: '12px 14px',
-            backgroundImage: !snapshot.isDragging
-              ? 'linear-gradient(135deg, rgba(255,255,255,0.02) 0%, rgba(255,255,255,0) 100%)'
-              : 'none',
+              ? '0 20px 48px rgba(0,0,0,0.7), 0 0 1px 1px rgba(184,151,90,0.3)'
+              : '0 1px 2px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.02)',
+            padding: '14px 16px',
+            backdropFilter: 'blur(8px)',
           }}
           whileHover={!snapshot.isDragging ? {
-            borderColor: 'rgba(58,59,51,0.95)',
-            boxShadow: '0 4px 16px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.04)',
-            y: -1,
+            y: -2,
+            borderColor: 'rgba(184,151,90,0.3)',
+            boxShadow: '0 8px 24px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.03)',
           } : {}}
         >
-          {/* Labels */}
+          {/* Labels Row */}
           {task.labels?.length > 0 && (
             <div className="flex flex-wrap gap-1 mb-2.5">
               {task.labels.map(l => <LabelBadge key={l} label={l} />)}
             </div>
           )}
 
-          {/* Title */}
-          <p className="text-sm font-medium text-bone leading-snug mb-3 group-hover:text-floral transition-colors duration-100">
+          {/* Task Title */}
+          <p className="text-xs font-semibold text-bone leading-snug mb-3 group-hover:text-floral transition-colors duration-100">
             {task.title}
           </p>
 
-          {/* Priority row */}
-          <div className="flex items-center gap-2 mb-3">
+          {/* Middle info/status row */}
+          <div className="flex items-center gap-2 mb-3.5">
             <PriorityBadge priority={task.priority} />
           </div>
 
-          {/* Footer */}
+          {/* Card Footer */}
           <div
-            className="flex items-center justify-between pt-2.5"
-            style={{ borderTop: '1px solid rgba(42,44,34,0.7)' }}
+            className="flex items-center justify-between pt-3"
+            style={{ borderTop: '1px solid rgba(86,84,73,0.1)' }}
           >
-            {/* Due date */}
-            <div className={`flex items-center gap-1 text-2xs font-medium ${overdue ? 'text-red-400' : 'text-olive/70'}`}>
+            {/* Due date indicator */}
+            <div className={`flex items-center gap-1.5 text-3xs font-bold uppercase tracking-wider ${overdue ? 'text-red-400' : 'text-olive/80'}`}>
               {overdue
                 ? <RiAlertFill className="text-xs flex-shrink-0" />
                 : <RiCalendarLine className="text-xs flex-shrink-0" />
@@ -83,19 +76,18 @@ export default function TaskCard({ task, index }) {
               <span>
                 {task.dueDate
                   ? new Date(task.dueDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
-                  : 'No date'}
+                  : 'No Date'}
               </span>
             </div>
 
-            <div className="flex items-center gap-2">
-              {/* Comments count */}
+            {/* Interaction details (comments / avatars) */}
+            <div className="flex items-center gap-2.5">
               {task.comments > 0 && (
-                <div className="flex items-center gap-1 text-2xs text-olive/60">
+                <div className="flex items-center gap-1 text-3xs text-olive/60 font-semibold">
                   <RiChat1Line className="text-xs" />
                   <span>{task.comments}</span>
                 </div>
               )}
-              {/* Assignee avatar */}
               {assignee && <Avatar user={assignee} size="xs" />}
             </div>
           </div>
