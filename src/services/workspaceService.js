@@ -26,8 +26,29 @@ const workspaceService = {
     return data;
   },
 
+  /** Invite a user to workspace by email */
   async addMember(id, email, role = 'Member') {
-    const { data } = await api.post(`/workspaces/${id}/members`, { email, role });
+    const { data } = await api.post(`/workspaces/${id}/members`, {
+      email: email.trim().toLowerCase(),
+      role,
+    });
+    return data.workspace;
+  },
+
+  /** Change a member's role */
+  async updateMemberRole(workspaceId, userId, role) {
+    const { data } = await api.put(
+      `/workspaces/${workspaceId}/members/${userId}/role`,
+      { role }
+    );
+    return data.workspace;
+  },
+
+  /** Remove a member from workspace */
+  async removeMember(workspaceId, userId) {
+    const { data } = await api.delete(
+      `/workspaces/${workspaceId}/members/${userId}`
+    );
     return data.workspace;
   },
 };

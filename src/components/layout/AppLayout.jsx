@@ -5,6 +5,7 @@ import TopBar from './TopBar';
 import MobileNav from './MobileNav';
 import { useApp } from '../../context/AppContext';
 import TaskDetailModal from '../board/TaskDetailModal';
+import Toast from '../ui/Toast';
 
 const pageVariants = {
   initial: { opacity: 0, y: 8 },
@@ -13,12 +14,38 @@ const pageVariants = {
 };
 
 export default function AppLayout({ children }) {
-  const { isTaskModalOpen, closeTask, selectedTask, sidebarOpen, setSidebarOpen, currentUser, authLoading } = useApp();
+  const { isTaskModalOpen, closeTask, selectedTask, sidebarOpen, setSidebarOpen, currentUser, authLoading, toast } = useApp();
 
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-smoky flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-bronze" />
+      <div className="min-h-screen bg-smoky flex">
+        {/* Sidebar skeleton */}
+        <div className="hidden lg:flex flex-col w-60 h-screen" style={{ background: '#161710', borderRight: '1px solid rgba(42,44,34,0.9)' }}>
+          <div className="px-5 py-4" style={{ borderBottom: '1px solid rgba(42,44,34,0.8)' }}>
+            <div className="h-6 w-28 skeleton shimmer rounded-lg" />
+          </div>
+          <div className="px-2.5 py-3 space-y-1">
+            {[1,2,3,4,5].map(i => (
+              <div key={i} className="flex items-center gap-3 px-3 py-2.5">
+                <div className="w-4 h-4 skeleton shimmer rounded" />
+                <div className="h-3 skeleton shimmer rounded" style={{ width: `${60 + i * 8}px` }} />
+              </div>
+            ))}
+          </div>
+        </div>
+        {/* Main area skeleton */}
+        <div className="flex-1 flex flex-col">
+          <div className="h-14" style={{ background: 'rgba(22,23,16,0.85)', borderBottom: '1px solid rgba(42,44,34,0.9)' }} />
+          <div className="flex-1 p-6 space-y-6">
+            <div className="h-8 w-48 skeleton shimmer rounded-xl" />
+            <div className="grid grid-cols-4 gap-4">
+              {[1,2,3,4].map(i => <div key={i} className="h-24 skeleton shimmer rounded-2xl" />)}
+            </div>
+            <div className="grid grid-cols-3 gap-4">
+              {[1,2,3].map(i => <div key={i} className="h-40 skeleton shimmer rounded-2xl" />)}
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
@@ -79,6 +106,15 @@ export default function AppLayout({ children }) {
           <TaskDetailModal task={selectedTask} onClose={closeTask} />
         )}
       </AnimatePresence>
+
+      {/* Global Toast */}
+      <div className="fixed bottom-6 right-6 z-[200] flex flex-col gap-2 items-end">
+        <AnimatePresence>
+          {toast && (
+            <Toast message={toast.message} type={toast.type} />
+          )}
+        </AnimatePresence>
+      </div>
     </div>
   );
 }

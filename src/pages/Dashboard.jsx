@@ -33,12 +33,22 @@ function SkeletonProjectRow() {
 }
 
 // ── Stat card ────────────────────────────────────────────────────────────────
-function StatCard({ label, value, sub, color }) {
+function StatCard({ label, value, sub, color, icon }) {
   return (
-    <motion.div variants={item} className="card p-5">
-      <p className="text-xs text-olive mb-1">{label}</p>
-      <p className={`text-3xl font-bold mb-1 ${color}`}>{value}</p>
-      <p className="text-xs text-olive/60">{sub}</p>
+    <motion.div
+      variants={item}
+      className="card p-5 relative overflow-hidden group card-hover"
+    >
+      {/* Subtle corner gradient */}
+      <div className="absolute -top-4 -right-4 w-16 h-16 rounded-full opacity-10 blur-xl"
+        style={{ background: color === 'text-green-400' ? '#4ade80' : color === 'text-red-400' ? '#f87171' : color === 'text-purple-400' ? '#c084fc' : '#B8975A' }}
+      />
+      <p className="text-2xs text-olive uppercase tracking-widest mb-3 font-medium">{label}</p>
+      <p className={`text-3xl font-bold mb-1 tracking-tight leading-none ${color}`}
+        style={{ fontFeatureSettings: '"tnum"' }}>
+        {value}
+      </p>
+      <p className="text-2xs text-olive/50 mt-2">{sub}</p>
     </motion.div>
   );
 }
@@ -188,14 +198,15 @@ export default function Dashboard() {
       {/* Greeting */}
       <motion.div variants={item} className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-floral mb-1">
+          <h1 className="text-2xl font-bold text-floral mb-1 tracking-tight" style={{ letterSpacing: '-0.025em' }}>
             {greeting}, {currentUser.name.split(' ')[0]} 👋
           </h1>
-          <p className="text-olive">
-            Here's what's happening in <span className="text-bone font-medium">{activeWorkspace.name}</span> today.
+          <p className="text-sm text-olive">
+            Here's what's happening in{' '}
+            <span className="text-bone font-medium">{activeWorkspace.name}</span> today.
           </p>
         </div>
-        <button id="dashboard-new-task" onClick={() => navigate('/board')} className="btn-primary hidden sm:flex">
+        <button id="dashboard-new-task" onClick={() => navigate('/board')} className="btn-primary hidden sm:flex flex-shrink-0">
           <RiAddLine /> New Task
         </button>
       </motion.div>
@@ -234,37 +245,38 @@ export default function Dashboard() {
               const progress = project.taskCount > 0
                 ? Math.round((project.completedCount / project.taskCount) * 100)
                 : 0;
+              const projectColor = project.color || '#9B8260';
               return (
                 <motion.div
                   key={project._id}
                   variants={item}
                   onClick={() => navigate('/board')}
-                  className="card card-hover p-4 cursor-pointer flex items-center gap-4"
+                  className="card card-hover p-4 cursor-pointer"
                 >
-                  <div
-                    className="w-10 h-10 rounded-xl flex-shrink-0 flex items-center justify-center text-lg font-bold"
-                    style={{ backgroundColor: (project.color || '#8B7355') + '22', color: project.color || '#8B7355' }}
-                  >
-                    {project.name.charAt(0)}
+                  <div className="flex items-center gap-3 mb-3">
+                    <div
+                      className="w-10 h-10 rounded-xl flex-shrink-0 flex items-center justify-center text-base font-bold"
+                      style={{ background: projectColor + '1A', color: projectColor, border: `1px solid ${projectColor}30` }}
+                    >
+                      {project.name.charAt(0).toUpperCase()}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-bone truncate">{project.name}</p>
+                      <p className="text-2xs text-olive">{project.taskCount || 0} tasks · {members.length} members</p>
+                    </div>
+                    <span className="text-2xs text-olive bg-surface-3 px-2 py-1 rounded-lg flex-shrink-0 font-medium">
+                      {progress}%
+                    </span>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between mb-1">
-                      <p className="text-sm font-semibold text-bone">{project.name}</p>
-                      <span className="text-xs text-olive">{progress}%</span>
-                    </div>
-                    <div className="w-full h-1.5 bg-surface-2 rounded-full mb-2">
-                      <motion.div
-                        initial={{ width: 0 }}
-                        animate={{ width: `${progress}%` }}
-                        transition={{ duration: 0.8, delay: i * 0.1, ease: 'easeOut' }}
-                        className="h-full rounded-full"
-                        style={{ backgroundColor: project.color || '#8B7355' }}
-                      />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <p className="text-xs text-olive">{project.completedCount || 0}/{project.taskCount || 0} tasks</p>
-                      <AvatarGroup users={members} max={3} size="xs" />
-                    </div>
+                  {/* Progress bar */}
+                  <div className="progress-track">
+                    <motion.div
+                      initial={{ width: 0 }}
+                      animate={{ width: `${progress}%` }}
+                      transition={{ duration: 0.9, delay: i * 0.1, ease: [0.4, 0, 0.2, 1] }}
+                      className="progress-fill"
+                      style={{ background: `linear-gradient(90deg, ${projectColor}99, ${projectColor})` }}
+                    />
                   </div>
                 </motion.div>
               );

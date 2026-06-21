@@ -36,20 +36,32 @@ export default function Register() {
   const set = (key) => (e) => { setForm(f => ({ ...f, [key]: e.target.value })); setErrors(er => ({ ...er, [key]: '' })); };
 
   return (
-    <div className="min-h-screen bg-smoky flex items-center justify-center px-4 py-12 relative overflow-hidden">
-      <div className="absolute top-1/3 right-1/4 w-80 h-80 bg-bronze/6 rounded-full blur-3xl" />
-      <div className="absolute bottom-1/3 left-1/4 w-60 h-60 bg-olive/8 rounded-full blur-3xl" />
+    <div className="min-h-screen flex items-center justify-center px-4 py-12 relative overflow-hidden" style={{ background: '#0E0F0B' }}>
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-0 right-1/4 w-[500px] h-[500px] rounded-full blur-[120px] opacity-20"
+          style={{ background: 'radial-gradient(circle, rgba(155,130,96,0.4) 0%, transparent 70%)' }} />
+        <div className="absolute bottom-0 left-1/4 w-[400px] h-[400px] rounded-full blur-[100px] opacity-15"
+          style={{ background: 'radial-gradient(circle, rgba(86,84,73,0.5) 0%, transparent 70%)' }} />
+        <div className="absolute inset-0 opacity-[0.03]"
+          style={{ backgroundImage: 'linear-gradient(rgba(216,207,188,0.8) 1px, transparent 1px), linear-gradient(90deg, rgba(216,207,188,0.8) 1px, transparent 1px)', backgroundSize: '60px 60px' }} />
+      </div>
 
-      <div className="w-full max-w-md relative z-10">
-        <motion.div initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }}
-          className="flex flex-col items-center justify-center gap-4 mb-10"
+      <div className="w-full max-w-sm relative z-10">
+        <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}
+          className="flex flex-col items-center justify-center gap-3 mb-8"
         >
           <Logo size="lg" />
-          <p className="text-sm text-olive">Forge Ideas Into Reality</p>
+          <p className="text-xs text-olive/70 tracking-widest uppercase">Forge Ideas Into Reality</p>
         </motion.div>
 
-        <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
-          className="glass rounded-3xl p-8"
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08, duration: 0.4 }}
+          className="rounded-2xl p-7"
+          style={{
+            background: 'rgba(22,23,16,0.8)',
+            backdropFilter: 'blur(24px) saturate(1.5)',
+            border: '1px solid rgba(42,44,34,0.9)',
+            boxShadow: '0 24px 80px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.06)',
+          }}
         >
           <h2 className="text-2xl font-bold text-floral mb-1">Create account</h2>
           <p className="text-sm text-olive mb-8">Start your free workspace today</p>

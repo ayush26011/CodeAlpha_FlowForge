@@ -265,13 +265,41 @@ export function AppProvider({ children }) {
         showToast(notif.message, 'success');
       };
 
+      // ── Workspace member real-time events ────────────────────────────────
+      const handleMemberAdded = ({ workspace: updatedWs }) => {
+        if (!updatedWs) return;
+        setWorkspaces(prev => prev.map(w => w._id === updatedWs._id ? updatedWs : w));
+        if (activeWorkspaceRef.current?._id === updatedWs._id) {
+          setActiveWorkspace(updatedWs);
+        }
+      };
+
+      const handleMemberRemoved = ({ workspace: updatedWs, removedUserId }) => {
+        if (!updatedWs) return;
+        setWorkspaces(prev => prev.map(w => w._id === updatedWs._id ? updatedWs : w));
+        if (activeWorkspaceRef.current?._id === updatedWs._id) {
+          setActiveWorkspace(updatedWs);
+        }
+      };
+
+      const handleMemberRoleUpdated = ({ workspace: updatedWs }) => {
+        if (!updatedWs) return;
+        setWorkspaces(prev => prev.map(w => w._id === updatedWs._id ? updatedWs : w));
+        if (activeWorkspaceRef.current?._id === updatedWs._id) {
+          setActiveWorkspace(updatedWs);
+        }
+      };
+
       const off1 = socketService.on('task_created',      handleTaskCreated);
       const off2 = socketService.on('task_updated',      handleTaskUpdated);
       const off3 = socketService.on('task_moved',        handleTaskMoved);
       const off4 = socketService.on('task_assigned',     handleTaskUpdated);
       const off5 = socketService.on('notification_created', handleNotification);
+      const off6 = socketService.on('workspace_member_added',        handleMemberAdded);
+      const off7 = socketService.on('workspace_member_removed',      handleMemberRemoved);
+      const off8 = socketService.on('workspace_member_role_updated', handleMemberRoleUpdated);
 
-      return () => { off1(); off2(); off3(); off4(); off5(); };
+      return () => { off1(); off2(); off3(); off4(); off5(); off6(); off7(); off8(); };
     };
 
     const socket = socketService.getSocket();
@@ -347,6 +375,14 @@ export function AppProvider({ children }) {
 
   const unreadCount = notifications.filter(n => !n.read).length;
 
+  // ── Helper: sync an updated workspace into both workspaces[] and activeWorkspace ──
+  const syncWorkspace = useCallback((updatedWs) => {
+    setWorkspaces(prev => prev.map(w => w._id === updatedWs._id ? updatedWs : w));
+    if (activeWorkspaceRef.current?._id === updatedWs._id) {
+      setActiveWorkspace(updatedWs);
+    }
+  }, []);
+
   return (
     <AppContext.Provider value={{
       // Auth
@@ -354,7 +390,7 @@ export function AppProvider({ children }) {
       login, register, logout, updateCurrentUser,
       // Workspaces
       workspaces, activeWorkspace, setActiveWorkspace,
-      loadWorkspaces,
+      loadWorkspaces, syncWorkspace,
       // Projects
       projects, activeProject, setActiveProject,
       loadProjects,

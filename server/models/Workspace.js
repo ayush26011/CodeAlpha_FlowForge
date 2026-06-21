@@ -1,5 +1,22 @@
 const mongoose = require('mongoose');
 
+const memberSchema = new mongoose.Schema({
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true,
+  },
+  role: {
+    type: String,
+    enum: ['Admin', 'Member', 'Viewer'],
+    default: 'Member',
+  },
+  joinedAt: {
+    type: Date,
+    default: Date.now,
+  },
+});
+
 const workspaceSchema = new mongoose.Schema(
   {
     name: {
@@ -22,31 +39,18 @@ const workspaceSchema = new mongoose.Schema(
       ref: 'User',
       required: true,
     },
-    members: [
-      {
-        user: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: 'User',
-          required: true,
-        },
-        role: {
-          type: String,
-          enum: ['Admin', 'Member', 'Viewer'],
-          default: 'Member',
-        },
-      },
-    ],
+    members: [memberSchema],
   },
   { timestamps: true }
 );
 
-// Ensure owner is always in members array
+// Ensure owner is always in members array as Admin
 workspaceSchema.pre('save', function (next) {
   const ownerInMembers = this.members.some(
     (m) => m.user.toString() === this.owner.toString()
   );
   if (!ownerInMembers) {
-    this.members.unshift({ user: this.owner, role: 'Admin' });
+    this.members.unshift({ user: this.owner, role: 'Admin', joinedAt: new Date() });
   }
   next();
 });

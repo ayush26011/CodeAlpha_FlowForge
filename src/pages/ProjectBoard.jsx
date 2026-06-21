@@ -79,24 +79,29 @@ export default function ProjectBoard() {
       <motion.div
         initial={{ opacity: 0, y: -8 }}
         animate={{ opacity: 1, y: 0 }}
-        className="flex items-center gap-3 mb-6 flex-wrap"
+        className="flex items-center gap-3 mb-5 flex-wrap"
       >
-        <div className="flex items-center gap-2">
-          <RiLayoutGridLine className="text-olive text-lg" />
-          <h1 className="page-title">
-            {activeProject ? activeProject.name : 'Project Board'}
-          </h1>
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-xl flex items-center justify-center"
+            style={{ background: 'rgba(155,130,96,0.12)', border: '1px solid rgba(155,130,96,0.2)' }}
+          >
+            <RiLayoutGridLine className="text-bronze text-sm" />
+          </div>
+          <div>
+            <h1 className="text-base font-bold text-floral tracking-tight">
+              {activeProject ? activeProject.name : 'Project Board'}
+            </h1>
+            {activeProject && (
+              <p className="text-2xs text-olive">{activeWorkspace?.name}</p>
+            )}
+          </div>
         </div>
-        {activeProject && (
-          <span className="text-xs text-olive bg-surface-2 px-2 py-1 rounded-lg">
-            {activeWorkspace?.name}
-          </span>
-        )}
         <div className="flex-1" />
-        <button className="btn-ghost text-sm gap-2">
-          <RiFilter3Line />Filter
+        <button className="btn-ghost text-sm gap-1.5">
+          <RiFilter3Line className="text-base" />Filter
         </button>
         <button
+          id="add-task-btn"
           className="btn-primary text-sm"
           onClick={() => setShowAddModal(true)}
         >
@@ -107,7 +112,7 @@ export default function ProjectBoard() {
       {/* Kanban Board */}
       <div className="flex-1 overflow-x-auto pb-4">
         <DragDropContext onDragEnd={onDragEnd}>
-          <div className="flex gap-5 min-w-max">
+          <div className="flex gap-4 min-w-max px-0.5 pb-2">
             {COLUMNS.map(col => (
               <KanbanColumn
                 key={col}
@@ -133,9 +138,14 @@ export default function ProjectBoard() {
             <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 16 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 16 }}
-              transition={{ type: 'spring', damping: 28, stiffness: 260 }}
-              className="card max-w-lg w-full p-6 relative z-10 space-y-5"
+              exit={{ opacity: 0, scale: 0.95, y: 8 }}
+              transition={{ type: 'spring', damping: 28, stiffness: 300 }}
+              className="max-w-lg w-full p-6 relative z-10 space-y-5 rounded-2xl"
+              style={{
+                background: '#1A1B14',
+                border: '1px solid rgba(42,44,34,0.9)',
+                boxShadow: '0 24px 80px rgba(0,0,0,0.7), 0 8px 32px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05)',
+              }}
             >
               <div className="flex items-center justify-between">
                 <h2 className="text-lg font-bold text-floral">New Task</h2>

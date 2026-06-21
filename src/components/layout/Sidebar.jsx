@@ -40,27 +40,37 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className="hidden lg:flex flex-col w-60 h-screen bg-surface border-r border-border fixed left-0 top-0 z-40">
+    <aside
+      className="hidden lg:flex flex-col w-60 h-screen fixed left-0 top-0 z-40"
+      style={{
+        background: '#161710',
+        borderRight: '1px solid rgba(42,44,34,0.9)',
+        boxShadow: '1px 0 0 rgba(255,255,255,0.03), 4px 0 24px rgba(0,0,0,0.3)',
+      }}
+    >
       {/* Logo */}
-      <div className="flex items-center px-5 py-4 border-b border-border">
+      <div className="flex items-center px-5 py-4" style={{ borderBottom: '1px solid rgba(42,44,34,0.8)' }}>
         <Logo size="md" />
       </div>
 
       {/* Workspace Switcher */}
-      <div className="px-3 py-3 border-b border-border">
+      <div className="px-2.5 py-2.5" style={{ borderBottom: '1px solid rgba(42,44,34,0.7)' }}>
         {activeWorkspace ? (
           <button
             onClick={() => setWsOpen(o => !o)}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-surface-2 transition-all duration-200 group"
+            className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl transition-all duration-150 group hover:bg-surface-3"
           >
-            <div className="w-7 h-7 rounded-lg bg-surface-3 flex items-center justify-center text-sm flex-shrink-0">
+            <div
+              className="w-7 h-7 rounded-lg flex items-center justify-center text-sm flex-shrink-0"
+              style={{ background: 'rgba(46,48,40,0.8)', border: '1px solid rgba(58,59,51,0.6)' }}
+            >
               {activeWorkspace.icon || '📁'}
             </div>
             <div className="flex-1 min-w-0 text-left">
-              <p className="text-sm font-semibold text-bone truncate">{activeWorkspace.name}</p>
-              <p className="text-xs text-olive">Workspace</p>
+              <p className="text-xs font-semibold text-bone truncate">{activeWorkspace.name}</p>
+              <p className="text-2xs text-olive/60 uppercase tracking-widest">Workspace</p>
             </div>
-            <RiArrowDownSLine className={`text-olive transition-transform duration-200 flex-shrink-0 ${wsOpen ? 'rotate-180' : ''}`} />
+            <RiArrowDownSLine className={`text-olive/60 transition-transform duration-200 flex-shrink-0 text-sm ${wsOpen ? 'rotate-180' : ''}`} />
           </button>
         ) : (
           <button
@@ -107,53 +117,63 @@ export default function Sidebar() {
       </div>
 
       {/* Nav */}
-      <nav className="flex-1 px-3 py-3 space-y-0.5 overflow-y-auto">
+      <nav className="flex-1 px-2.5 py-3 space-y-0.5 overflow-y-auto no-scrollbar">
         {navItems.map(({ to, icon: Icon, label }) => (
           <NavLink
             key={to}
             to={to}
             className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}
           >
-            <Icon className="text-lg flex-shrink-0" />
-            <span>{label}</span>
+            <Icon className="text-base flex-shrink-0" />
+            <span className="tracking-tight">{label}</span>
             {label === 'Notifications' && unreadCount > 0 && (
-              <span className="ml-auto bg-bronze text-floral text-xs font-bold px-1.5 py-0.5 rounded-full min-w-[20px] text-center">
-                {unreadCount}
+              <span
+                className="ml-auto text-2xs font-bold px-1.5 py-0.5 rounded-full min-w-[20px] text-center text-floral"
+                style={{ background: 'linear-gradient(135deg, #B8975A, #9B8260)', fontSize: '10px' }}
+              >
+                {unreadCount > 9 ? '9+' : unreadCount}
               </span>
             )}
           </NavLink>
         ))}
 
-        <div className="pt-3 border-t border-border mt-3">
-          <p className="px-3 text-xs font-semibold text-olive/60 uppercase tracking-wider mb-2">Workspace</p>
+        <div className="pt-2 mt-2" style={{ borderTop: '1px solid rgba(42,44,34,0.7)' }}>
+          <p className="px-3 text-2xs font-semibold text-olive/40 uppercase tracking-widest mb-1.5">Workspace</p>
           <NavLink to="/workspace" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
-            <span className="text-base">{activeWorkspace?.icon || '📁'}</span>
-            <span className="truncate">{activeWorkspace?.name || 'My Workspace'}</span>
+            <span className="text-sm">{activeWorkspace?.icon || '📁'}</span>
+            <span className="truncate text-sm">{activeWorkspace?.name || 'My Workspace'}</span>
           </NavLink>
         </div>
       </nav>
 
       {/* Bottom */}
-      <div className="px-3 py-3 border-t border-border space-y-0.5">
+      <div className="px-2.5 py-2.5 space-y-0.5" style={{ borderTop: '1px solid rgba(42,44,34,0.7)' }}>
         {bottomItems.map(({ to, icon: Icon, label }) => (
           <NavLink key={to} to={to} className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
-            <Icon className="text-lg flex-shrink-0" />
-            <span>{label}</span>
+            <Icon className="text-base flex-shrink-0" />
+            <span className="tracking-tight">{label}</span>
           </NavLink>
         ))}
-        <div className="mt-2 px-3 py-2.5 rounded-xl flex items-center gap-3">
+        <div
+          className="mt-2 px-2.5 py-2 rounded-xl flex items-center gap-2.5"
+          style={{ background: 'rgba(30,32,24,0.5)', border: '1px solid rgba(42,44,34,0.5)' }}
+        >
           <img
             src={getAvatarUrl(currentUser)}
             alt={currentUser.name}
-            className="w-7 h-7 rounded-full bg-surface-3 flex-shrink-0"
+            className="w-7 h-7 rounded-full bg-surface-3 flex-shrink-0 ring-1 ring-border object-cover"
             onError={e => { e.target.src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(currentUser.name)}`; }}
           />
           <div className="flex-1 min-w-0">
             <p className="text-xs font-semibold text-bone truncate">{currentUser.name}</p>
-            <p className="text-xs text-olive truncate">{currentUser.role || 'Member'}</p>
+            <p className="text-2xs text-olive/60 truncate">{currentUser.email}</p>
           </div>
-          <button onClick={handleLogout} className="text-olive hover:text-bone transition-colors" title="Logout">
-            <RiLogoutBoxLine className="text-base" />
+          <button
+            onClick={handleLogout}
+            className="text-olive/60 hover:text-red-400 transition-colors p-0.5"
+            title="Logout"
+          >
+            <RiLogoutBoxLine className="text-sm" />
           </button>
         </div>
       </div>
