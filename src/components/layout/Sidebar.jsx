@@ -23,7 +23,7 @@ const bottomItems = [
   { to: '/settings', icon: RiSettings3Line, label: 'Settings' },
 ];
 
-export default function Sidebar() {
+export default function Sidebar({ className = "hidden lg:flex w-64 fixed left-0 top-0 z-40" }) {
   const { workspaces, activeWorkspace, setActiveWorkspace, currentUser, unreadCount, logout } = useApp();
   const [wsOpen, setWsOpen] = useState(false);
   const navigate = useNavigate();
@@ -37,7 +37,7 @@ export default function Sidebar() {
 
   return (
     <aside
-      className="hidden lg:flex flex-col w-64 h-screen fixed left-0 top-0 z-40"
+      className={`flex flex-col h-screen ${className}`}
       style={{
         background: '#11120D',
         borderRight: '1px solid rgba(86,84,73,0.15)',

@@ -11,6 +11,7 @@ const {
   updateSecuritySettings,
   uploadAvatar,
   searchUsers,
+  updateSettings,
 } = require('../controllers/userController');
 const { protect } = require('../middleware/authMiddleware');
 
@@ -33,6 +34,7 @@ router.put(
 
 router.put('/privacy', updatePrivacy);
 router.put('/notifications', updateNotifications);
+router.put('/settings', updateSettings);
 router.put('/appearance', updateAppearance);
 router.put('/security/password', changePassword);
 router.put('/security/settings', updateSecuritySettings);

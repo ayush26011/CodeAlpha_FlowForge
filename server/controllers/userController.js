@@ -204,6 +204,84 @@ const uploadAvatar = async (req, res, next) => {
   }
 };
 
+// ─── PUT /api/users/settings ──────────────────────────────────────────────────
+const updateSettings = async (req, res, next) => {
+  try {
+    console.log('Update Settings Request Payload:', req.body);
+    const { privacySettings, notificationSettings } = req.body;
+    const updates = {};
+
+    if (privacySettings) {
+      const { profileVisibility, activityStatus, allowInvites, allowMessages } = privacySettings;
+      if (profileVisibility !== undefined) {
+        updates['privacy.profileVisibility'] = profileVisibility;
+        updates['privacySettings.profileVisibility'] = profileVisibility;
+      }
+      if (activityStatus !== undefined) {
+        updates['privacy.activityStatus'] = activityStatus;
+        updates['privacySettings.activityStatus'] = activityStatus;
+      }
+      if (allowInvites !== undefined) {
+        updates['privacy.allowInvites'] = allowInvites;
+        updates['privacySettings.allowInvites'] = allowInvites;
+      }
+      if (allowMessages !== undefined) {
+        updates['privacy.allowMessages'] = allowMessages;
+        updates['privacySettings.allowMessages'] = allowMessages;
+      }
+    }
+
+    if (notificationSettings) {
+      const {
+        taskAssigned, taskUpdated, comments, mentions,
+        emailDigests, desktopPushNotifications, dueDateReminders, workspaceUpdates
+      } = notificationSettings;
+      
+      if (taskAssigned !== undefined) {
+        updates['notifications.taskAssigned'] = taskAssigned;
+        updates['notificationSettings.taskAssigned'] = taskAssigned;
+      }
+      if (taskUpdated !== undefined) {
+        updates['notifications.taskUpdated'] = taskUpdated;
+        updates['notificationSettings.taskUpdated'] = taskUpdated;
+      }
+      if (comments !== undefined) {
+        updates['notifications.comments'] = comments;
+        updates['notificationSettings.comments'] = comments;
+      }
+      if (mentions !== undefined) {
+        updates['notifications.mentions'] = mentions;
+        updates['notificationSettings.mentions'] = mentions;
+      }
+      if (emailDigests !== undefined) {
+        updates['notifications.email'] = emailDigests;
+        updates['notificationSettings.emailDigests'] = emailDigests;
+      }
+      if (desktopPushNotifications !== undefined) {
+        updates['notifications.push'] = desktopPushNotifications;
+        updates['notificationSettings.desktopPushNotifications'] = desktopPushNotifications;
+      }
+      if (dueDateReminders !== undefined) {
+        updates['notifications.dueDateReminders'] = dueDateReminders;
+        updates['notificationSettings.dueDateReminders'] = dueDateReminders;
+      }
+      if (workspaceUpdates !== undefined) {
+        updates['notifications.workspaceUpdates'] = workspaceUpdates;
+        updates['notificationSettings.workspaceUpdates'] = workspaceUpdates;
+      }
+    }
+
+    const user = await User.findByIdAndUpdate(req.user._id, updates, {
+      new: true,
+    });
+    console.log('Saved MongoDB Document:', user);
+    console.log('Response Payload:', { success: true, user });
+    res.json({ success: true, user });
+  } catch (error) {
+    next(error);
+  }
+};
+
 // ─── GET /api/users/search?query= ────────────────────────────────────────────
 const searchUsers = async (req, res, next) => {
   try {
@@ -234,4 +312,5 @@ module.exports = {
   updateSecuritySettings,
   uploadAvatar,
   searchUsers,
+  updateSettings,
 };

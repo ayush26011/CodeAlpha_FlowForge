@@ -56,7 +56,7 @@ export default function AppLayout({ children }) {
 
   return (
     <div className="min-h-screen bg-smoky">
-      <Sidebar />
+      <Sidebar className="hidden lg:flex w-64 fixed left-0 top-0 z-40" />
 
       {/* Mobile Sidebar Overlay */}
       <AnimatePresence>
@@ -70,13 +70,13 @@ export default function AppLayout({ children }) {
               className="lg:hidden fixed inset-0 bg-smoky/70 backdrop-blur-sm z-40"
             />
             <motion.div
-              initial={{ x: -240 }}
+              initial={{ x: -256 }}
               animate={{ x: 0 }}
-              exit={{ x: -240 }}
+              exit={{ x: -256 }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
               className="lg:hidden fixed left-0 top-0 z-50 h-full"
             >
-              <Sidebar />
+              <Sidebar className="flex w-64" />
             </motion.div>
           </>
         )}

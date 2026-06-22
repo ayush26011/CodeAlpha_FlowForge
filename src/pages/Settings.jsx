@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { useApp } from '../context/AppContext';
 import userService from '../services/userService';
 import workspaceService from '../services/workspaceService';
+import settingsService from '../services/settingsService';
 import EmptyState from '../components/ui/EmptyState';
 import {
   RiSettings3Line, RiShieldLine, RiNotification3Line,
@@ -58,20 +59,20 @@ export default function Settings() {
   const [wsDesc, setWsDesc] = useState(activeWorkspace?.description || '');
 
   // Privacy inputs
-  const [profileVisibility, setProfileVisibility] = useState(currentUser?.privacy?.profileVisibility ?? true);
-  const [activityStatus, setActivityStatus] = useState(currentUser?.privacy?.activityStatus ?? true);
-  const [allowInvites, setAllowInvites] = useState(currentUser?.privacy?.allowInvites ?? true);
-  const [allowMessages, setAllowMessages] = useState(currentUser?.privacy?.allowMessages ?? true);
+  const [profileVisibility, setProfileVisibility] = useState(currentUser?.privacySettings?.profileVisibility ?? currentUser?.privacy?.profileVisibility ?? true);
+  const [activityStatus, setActivityStatus] = useState(currentUser?.privacySettings?.activityStatus ?? currentUser?.privacy?.activityStatus ?? true);
+  const [allowInvites, setAllowInvites] = useState(currentUser?.privacySettings?.allowInvites ?? currentUser?.privacy?.allowInvites ?? true);
+  const [allowMessages, setAllowMessages] = useState(currentUser?.privacySettings?.allowMessages ?? currentUser?.privacy?.allowMessages ?? true);
 
   // Notifications inputs
-  const [taskAssigned, setTaskAssigned] = useState(currentUser?.notifications?.taskAssigned ?? true);
-  const [taskUpdated, setTaskUpdated] = useState(currentUser?.notifications?.taskUpdated ?? true);
-  const [comments, setComments] = useState(currentUser?.notifications?.comments ?? true);
-  const [mentions, setMentions] = useState(currentUser?.notifications?.mentions ?? true);
-  const [notifEmail, setNotifEmail] = useState(currentUser?.notifications?.email ?? true);
-  const [notifPush, setNotifPush] = useState(currentUser?.notifications?.push ?? false);
-  const [dueDateReminders, setDueDateReminders] = useState(currentUser?.notifications?.dueDateReminders ?? true);
-  const [workspaceUpdates, setWorkspaceUpdates] = useState(currentUser?.notifications?.workspaceUpdates ?? true);
+  const [taskAssigned, setTaskAssigned] = useState(currentUser?.notificationSettings?.taskAssigned ?? currentUser?.notifications?.taskAssigned ?? true);
+  const [taskUpdated, setTaskUpdated] = useState(currentUser?.notificationSettings?.taskUpdated ?? currentUser?.notifications?.taskUpdated ?? true);
+  const [comments, setComments] = useState(currentUser?.notificationSettings?.comments ?? currentUser?.notifications?.comments ?? true);
+  const [mentions, setMentions] = useState(currentUser?.notificationSettings?.mentions ?? currentUser?.notifications?.mentions ?? true);
+  const [notifEmail, setNotifEmail] = useState(currentUser?.notificationSettings?.emailDigests ?? currentUser?.notifications?.email ?? true);
+  const [notifPush, setNotifPush] = useState(currentUser?.notificationSettings?.desktopPushNotifications ?? currentUser?.notifications?.push ?? false);
+  const [dueDateReminders, setDueDateReminders] = useState(currentUser?.notificationSettings?.dueDateReminders ?? currentUser?.notifications?.dueDateReminders ?? true);
+  const [workspaceUpdates, setWorkspaceUpdates] = useState(currentUser?.notificationSettings?.workspaceUpdates ?? currentUser?.notifications?.workspaceUpdates ?? true);
 
   // Appearance inputs
   const [themeMode, setThemeMode] = useState(currentUser?.appearance?.themeMode || 'dark');
@@ -99,19 +100,19 @@ export default function Settings() {
         setTitle(currentUser.title || '');
         setAccountType(currentUser.accountType || 'Personal');
 
-        setProfileVisibility(currentUser.privacy?.profileVisibility ?? true);
-        setActivityStatus(currentUser.privacy?.activityStatus ?? true);
-        setAllowInvites(currentUser.privacy?.allowInvites ?? true);
-        setAllowMessages(currentUser.privacy?.allowMessages ?? true);
+        setProfileVisibility(currentUser.privacySettings?.profileVisibility ?? currentUser.privacy?.profileVisibility ?? true);
+        setActivityStatus(currentUser.privacySettings?.activityStatus ?? currentUser.privacy?.activityStatus ?? true);
+        setAllowInvites(currentUser.privacySettings?.allowInvites ?? currentUser.privacy?.allowInvites ?? true);
+        setAllowMessages(currentUser.privacySettings?.allowMessages ?? currentUser.privacy?.allowMessages ?? true);
 
-        setTaskAssigned(currentUser.notifications?.taskAssigned ?? true);
-        setTaskUpdated(currentUser.notifications?.taskUpdated ?? true);
-        setComments(currentUser.notifications?.comments ?? true);
-        setMentions(currentUser.notifications?.mentions ?? true);
-        setNotifEmail(currentUser.notifications?.email ?? true);
-        setNotifPush(currentUser.notifications?.push ?? false);
-        setDueDateReminders(currentUser.notifications?.dueDateReminders ?? true);
-        setWorkspaceUpdates(currentUser.notifications?.workspaceUpdates ?? true);
+        setTaskAssigned(currentUser.notificationSettings?.taskAssigned ?? currentUser.notifications?.taskAssigned ?? true);
+        setTaskUpdated(currentUser.notificationSettings?.taskUpdated ?? currentUser.notifications?.taskUpdated ?? true);
+        setComments(currentUser.notificationSettings?.comments ?? currentUser.notifications?.comments ?? true);
+        setMentions(currentUser.notificationSettings?.mentions ?? currentUser.notifications?.mentions ?? true);
+        setNotifEmail(currentUser.notificationSettings?.emailDigests ?? currentUser.notifications?.email ?? true);
+        setNotifPush(currentUser.notificationSettings?.desktopPushNotifications ?? currentUser.notifications?.push ?? false);
+        setDueDateReminders(currentUser.notificationSettings?.dueDateReminders ?? currentUser.notifications?.dueDateReminders ?? true);
+        setWorkspaceUpdates(currentUser.notificationSettings?.workspaceUpdates ?? currentUser.notifications?.workspaceUpdates ?? true);
 
         setThemeMode(currentUser.appearance?.themeMode || 'dark');
         setReduceMotion(currentUser.appearance?.reduceMotion ?? false);
@@ -167,7 +168,15 @@ export default function Settings() {
 
   const handleSavePrivacy = async () => {
     try {
-      const updatedUser = await userService.updatePrivacy({ profileVisibility, activityStatus, allowInvites, allowMessages });
+      const payload = {
+        privacySettings: {
+          profileVisibility,
+          activityStatus,
+          allowInvites,
+          allowMessages
+        }
+      };
+      const updatedUser = await settingsService.updateSettings(payload);
       updateCurrentUser(updatedUser);
       showToast('Privacy preferences updated!', 'success');
     } catch (e) {
@@ -177,7 +186,19 @@ export default function Settings() {
 
   const handleSaveNotifications = async () => {
     try {
-      const updatedUser = await userService.updateNotifications({ taskAssigned, taskUpdated, comments, mentions, email: notifEmail, push: notifPush, dueDateReminders, workspaceUpdates });
+      const payload = {
+        notificationSettings: {
+          taskAssigned,
+          taskUpdated,
+          comments,
+          mentions,
+          emailDigests: notifEmail,
+          desktopPushNotifications: notifPush,
+          dueDateReminders,
+          workspaceUpdates
+        }
+      };
+      const updatedUser = await settingsService.updateSettings(payload);
       updateCurrentUser(updatedUser);
       showToast('Notification settings saved!', 'success');
     } catch (e) {
@@ -273,12 +294,12 @@ export default function Settings() {
 
       <div className="grid md:grid-cols-4 gap-6">
         {/* Navigation Selector segments */}
-        <div className="md:col-span-1 flex flex-col gap-1">
+        <div className="md:col-span-1 flex flex-row md:flex-col gap-1 overflow-x-auto no-scrollbar pb-2 md:pb-0 whitespace-nowrap">
           {tabs.map(tab => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer text-left
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer text-left flex-shrink-0
                 ${activeTab === tab.id
                   ? 'bg-surface text-bone border border-white/5 shadow-xs font-bold'
                   : 'text-olive hover:text-bone hover:bg-white/5 border border-transparent'}`}
@@ -289,7 +310,7 @@ export default function Settings() {
           ))}
           <button
             onClick={handleLogout}
-            className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold uppercase tracking-wider text-red-400 hover:bg-red-950/20 transition-all mt-4 cursor-pointer text-left"
+            className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold uppercase tracking-wider text-red-400 hover:bg-red-950/20 transition-all mt-0 md:mt-4 flex-shrink-0 cursor-pointer text-left"
           >
             <RiLogoutBoxLine className="text-base" />
             <span>Logout</span>
