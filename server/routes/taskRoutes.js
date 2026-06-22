@@ -19,9 +19,16 @@ router.use(protect);
 
 const createValidators = [
   body('title').trim().notEmpty().withMessage('Task title is required').isLength({ max: 250 }),
-  body('projectId').notEmpty().withMessage('projectId is required').isMongoId(),
+  body('projectId').optional().isMongoId(),
+  body('project').optional().isMongoId(),
   body('status').optional().isIn(['backlog', 'todo', 'inprogress', 'review', 'done']),
   body('priority').optional().isIn(['low', 'medium', 'high', 'urgent']),
+  body().custom(body => {
+    if (!body.projectId && !body.project) {
+      throw new Error('Project ID is required');
+    }
+    return true;
+  })
 ];
 
 router.post('/', createValidators, createTask);

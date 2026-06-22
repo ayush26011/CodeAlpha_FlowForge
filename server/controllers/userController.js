@@ -44,7 +44,7 @@ const updateProfile = async (req, res, next) => {
       return res.status(400).json({ success: false, errors: errors.array() });
     }
 
-    const { name, email, role, avatar, phone, bio, website, timezone } = req.body;
+    const { name, email, role, avatar, phone, bio, website, timezone, location, title, accountType } = req.body;
     const updates = {};
     if (name !== undefined) updates.name = name;
     if (email !== undefined) updates.email = email;
@@ -54,6 +54,9 @@ const updateProfile = async (req, res, next) => {
     if (bio !== undefined) updates.bio = bio;
     if (website !== undefined) updates.website = website;
     if (timezone !== undefined) updates.timezone = timezone;
+    if (location !== undefined) updates.location = location;
+    if (title !== undefined) updates.title = title;
+    if (accountType !== undefined) updates.accountType = accountType;
 
     // Check if email already exists
     if (email) {
@@ -96,7 +99,7 @@ const updatePrivacy = async (req, res, next) => {
 // ─── PUT /api/users/notifications ──────────────────────────────────────────────
 const updateNotifications = async (req, res, next) => {
   try {
-    const { taskAssigned, taskUpdated, comments, mentions, email, push } = req.body;
+    const { taskAssigned, taskUpdated, comments, mentions, email, push, dueDateReminders, workspaceUpdates } = req.body;
     const updates = {};
     if (taskAssigned !== undefined) updates['notifications.taskAssigned'] = taskAssigned;
     if (taskUpdated !== undefined) updates['notifications.taskUpdated'] = taskUpdated;
@@ -104,6 +107,8 @@ const updateNotifications = async (req, res, next) => {
     if (mentions !== undefined) updates['notifications.mentions'] = mentions;
     if (email !== undefined) updates['notifications.email'] = email;
     if (push !== undefined) updates['notifications.push'] = push;
+    if (dueDateReminders !== undefined) updates['notifications.dueDateReminders'] = dueDateReminders;
+    if (workspaceUpdates !== undefined) updates['notifications.workspaceUpdates'] = workspaceUpdates;
 
     const user = await User.findByIdAndUpdate(req.user._id, updates, {
       new: true,

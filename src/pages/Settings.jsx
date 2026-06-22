@@ -49,6 +49,9 @@ export default function Settings() {
   const [bio, setBio] = useState(currentUser?.bio || '');
   const [website, setWebsite] = useState(currentUser?.website || '');
   const [timezone, setTimezone] = useState(currentUser?.timezone || 'UTC');
+  const [location, setLocation] = useState(currentUser?.location || '');
+  const [title, setTitle] = useState(currentUser?.title || '');
+  const [accountType, setAccountType] = useState(currentUser?.accountType || 'Personal');
 
   // Workspace Settings inputs
   const [wsName, setWsName] = useState(activeWorkspace?.name || '');
@@ -67,6 +70,8 @@ export default function Settings() {
   const [mentions, setMentions] = useState(currentUser?.notifications?.mentions ?? true);
   const [notifEmail, setNotifEmail] = useState(currentUser?.notifications?.email ?? true);
   const [notifPush, setNotifPush] = useState(currentUser?.notifications?.push ?? false);
+  const [dueDateReminders, setDueDateReminders] = useState(currentUser?.notifications?.dueDateReminders ?? true);
+  const [workspaceUpdates, setWorkspaceUpdates] = useState(currentUser?.notifications?.workspaceUpdates ?? true);
 
   // Appearance inputs
   const [themeMode, setThemeMode] = useState(currentUser?.appearance?.themeMode || 'dark');
@@ -90,6 +95,9 @@ export default function Settings() {
         setBio(currentUser.bio || '');
         setWebsite(currentUser.website || '');
         setTimezone(currentUser.timezone || 'UTC');
+        setLocation(currentUser.location || '');
+        setTitle(currentUser.title || '');
+        setAccountType(currentUser.accountType || 'Personal');
 
         setProfileVisibility(currentUser.privacy?.profileVisibility ?? true);
         setActivityStatus(currentUser.privacy?.activityStatus ?? true);
@@ -102,6 +110,8 @@ export default function Settings() {
         setMentions(currentUser.notifications?.mentions ?? true);
         setNotifEmail(currentUser.notifications?.email ?? true);
         setNotifPush(currentUser.notifications?.push ?? false);
+        setDueDateReminders(currentUser.notifications?.dueDateReminders ?? true);
+        setWorkspaceUpdates(currentUser.notifications?.workspaceUpdates ?? true);
 
         setThemeMode(currentUser.appearance?.themeMode || 'dark');
         setReduceMotion(currentUser.appearance?.reduceMotion ?? false);
@@ -137,7 +147,7 @@ export default function Settings() {
 
   const handleSaveProfile = async () => {
     try {
-      const updatedUser = await userService.updateProfile({ name, email, phone, bio, website, timezone });
+      const updatedUser = await userService.updateProfile({ name, email, phone, bio, website, timezone, location, title, accountType });
       updateCurrentUser(updatedUser);
       showToast('Profile updated successfully!', 'success');
     } catch (e) {
@@ -167,7 +177,7 @@ export default function Settings() {
 
   const handleSaveNotifications = async () => {
     try {
-      const updatedUser = await userService.updateNotifications({ taskAssigned, taskUpdated, comments, mentions, email: notifEmail, push: notifPush });
+      const updatedUser = await userService.updateNotifications({ taskAssigned, taskUpdated, comments, mentions, email: notifEmail, push: notifPush, dueDateReminders, workspaceUpdates });
       updateCurrentUser(updatedUser);
       showToast('Notification settings saved!', 'success');
     } catch (e) {
@@ -377,23 +387,60 @@ export default function Settings() {
                 />
               </div>
 
-              <div>
-                <label className="label">Timezone</label>
-                <select
-                  value={timezone}
-                  onChange={e => setTimezone(e.target.value)}
-                  className="input text-xs"
-                >
-                  <option value="UTC">Coordinated Universal Time (UTC)</option>
-                  <option value="America/New_York">Eastern Time (ET)</option>
-                  <option value="America/Chicago">Central Time (CT)</option>
-                  <option value="America/Denver">Mountain Time (MT)</option>
-                  <option value="America/Los_Angeles">Pacific Time (PT)</option>
-                  <option value="Europe/London">London (GMT/BST)</option>
-                  <option value="Europe/Paris">Paris (CET/CEST)</option>
-                  <option value="Asia/Kolkata">India (IST)</option>
-                  <option value="Asia/Tokyo">Tokyo (JST)</option>
-                </select>
+              <div className="grid sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="label">Title</label>
+                  <input
+                    type="text"
+                    value={title}
+                    onChange={e => setTitle(e.target.value)}
+                    placeholder="e.g. Lead Designer, Software Engineer"
+                    className="input text-xs"
+                  />
+                </div>
+                <div>
+                  <label className="label">Location</label>
+                  <input
+                    type="text"
+                    value={location}
+                    onChange={e => setLocation(e.target.value)}
+                    placeholder="e.g. San Francisco, CA"
+                    className="input text-xs"
+                  />
+                </div>
+              </div>
+
+              <div className="grid sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="label">Account Type</label>
+                  <select
+                    value={accountType}
+                    onChange={e => setAccountType(e.target.value)}
+                    className="input text-xs"
+                  >
+                    <option value="Personal">Personal</option>
+                    <option value="Business">Business</option>
+                    <option value="Enterprise">Enterprise</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="label">Timezone</label>
+                  <select
+                    value={timezone}
+                    onChange={e => setTimezone(e.target.value)}
+                    className="input text-xs"
+                  >
+                    <option value="UTC">Coordinated Universal Time (UTC)</option>
+                    <option value="America/New_York">Eastern Time (ET)</option>
+                    <option value="America/Chicago">Central Time (CT)</option>
+                    <option value="America/Denver">Mountain Time (MT)</option>
+                    <option value="America/Los_Angeles">Pacific Time (PT)</option>
+                    <option value="Europe/London">London (GMT/BST)</option>
+                    <option value="Europe/Paris">Paris (CET/CEST)</option>
+                    <option value="Asia/Kolkata">India (IST)</option>
+                    <option value="Asia/Tokyo">Tokyo (JST)</option>
+                  </select>
+                </div>
               </div>
 
               <div className="pt-2">
@@ -519,6 +566,18 @@ export default function Settings() {
                   label="Desktop Push Notifications"
                   sub="Show browser push notifications instantly for task events."
                 />
+                <Toggle
+                  checked={dueDateReminders}
+                  onChange={setDueDateReminders}
+                  label="Due Date Reminders"
+                  sub="Receive notifications as task deadlines approach."
+                />
+                <Toggle
+                  checked={workspaceUpdates}
+                  onChange={setWorkspaceUpdates}
+                  label="Workspace Updates"
+                  sub="Receive updates when projects are created or modified."
+                />
               </div>
 
               <div className="pt-2">
@@ -621,6 +680,12 @@ export default function Settings() {
                   onChange={setLoginAlerts}
                   label="Login Alerts"
                   sub="Receive security updates whenever a login succeeds on a new device."
+                />
+                <Toggle
+                  checked={false}
+                  onChange={() => showToast('Two-Factor Authentication is currently being forged.', 'info')}
+                  label="Two-Factor Authentication (2FA)"
+                  sub="Add an extra layer of protection to your account with authenticator apps."
                 />
                 <div className="pt-1">
                   <button onClick={handleSaveSecurity} className="btn-primary text-2xs uppercase tracking-wider py-2">Save Security Preferences</button>

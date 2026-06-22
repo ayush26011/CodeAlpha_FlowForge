@@ -210,7 +210,16 @@ export default function Dashboard() {
   }
 
   const hour     = new Date().getHours();
-  const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+  let greeting = 'Good Night';
+  if (hour >= 5 && hour < 12) {
+    greeting = 'Good Morning';
+  } else if (hour >= 12 && hour < 17) {
+    greeting = 'Good Afternoon';
+  } else if (hour >= 17 && hour < 21) {
+    greeting = 'Good Evening';
+  } else {
+    greeting = 'Good Night';
+  }
 
   const myTasks       = allTasks.filter(t => (t.assignee?._id || t.assignee) === currentUser._id);
   const overdue       = myTasks.filter(t => t.status !== 'done' && t.dueDate && new Date(t.dueDate) < new Date());

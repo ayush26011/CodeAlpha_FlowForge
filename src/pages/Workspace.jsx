@@ -144,6 +144,138 @@ function CreateWorkspaceModal({ onClose, onCreated }) {
   );
 }
 
+// ── Create Project Modal ──────────────────────────────────────────────────────
+function CreateProjectModal({ onClose, onCreated }) {
+  const [name, setName]               = useState('');
+  const [description, setDescription] = useState('');
+  const [dueDate, setDueDate]         = useState('');
+  const [color, setColor]             = useState('#8B7355');
+  const [saving, setSaving]           = useState(false);
+  const [error, setError]             = useState('');
+
+  const colors = ['#8B7355', '#4E6A56', '#8B5A2B', '#5C6C7C', '#8A6D3B', '#7A6B8A'];
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!name.trim()) { setError('Project name is required'); return; }
+    setSaving(true);
+    setError('');
+    try {
+      await onCreated({ name: name.trim(), description: description.trim(), dueDate, color });
+    } catch (err) {
+      setError(err.message || 'Failed to create project');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+      className="fixed inset-0 z-50 flex items-center justify-center bg-smoky/80 backdrop-blur-sm p-4"
+      onClick={(e) => e.target === e.currentTarget && onClose()}
+    >
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95, y: 16 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.95, y: 16 }}
+        transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+        className="card w-full max-w-md p-6 space-y-5"
+        onClick={e => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-bold text-floral">Create Project</h2>
+          <button id="close-create-project" onClick={onClose} className="btn-ghost p-1.5">
+            <RiCloseLine className="text-xl" />
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-xs text-olive mb-1.5" htmlFor="proj-name">
+              Project Name <span className="text-red-400">*</span>
+            </label>
+            <input
+              id="proj-name"
+              type="text"
+              value={name}
+              onChange={e => setName(e.target.value)}
+              placeholder="e.g. Website V2, Q3 Campaign, Mobile App"
+              className="input w-full text-xs"
+              autoFocus
+              maxLength={150}
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs text-olive mb-1.5" htmlFor="proj-desc">
+              Description <span className="text-olive/50">(optional)</span>
+            </label>
+            <textarea
+              id="proj-desc"
+              value={description}
+              onChange={e => setDescription(e.target.value)}
+              placeholder="What is this project about?"
+              className="input w-full resize-none text-xs"
+              rows={3}
+              maxLength={500}
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs text-olive mb-1.5">Due Date</label>
+              <input
+                type="date"
+                value={dueDate}
+                onChange={e => setDueDate(e.target.value)}
+                className="input w-full text-xs"
+              />
+            </div>
+            <div>
+              <label className="block text-xs text-olive mb-2">Color Tag</label>
+              <div className="flex gap-1.5 flex-wrap">
+                {colors.map(c => (
+                  <button
+                    key={c} type="button"
+                    onClick={() => setColor(c)}
+                    className="w-6 h-6 rounded-lg transition-transform hover:scale-110"
+                    style={{ backgroundColor: c, border: color === c ? '2px solid #FFFBF4' : 'none' }}
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {error && (
+            <p className="text-sm text-red-400 bg-red-500/10 rounded-lg px-3 py-2">{error}</p>
+          )}
+
+          <div className="flex gap-3 pt-1">
+            <button
+              id="submit-create-project"
+              type="submit"
+              disabled={saving}
+              className="btn-primary flex-1 flex items-center justify-center gap-2"
+            >
+              {saving ? <RiLoader4Line className="animate-spin" /> : <RiAddLine />}
+              {saving ? 'Creating…' : 'Create Project'}
+            </button>
+            <button
+              id="cancel-create-project"
+              type="button"
+              onClick={onClose}
+              className="btn-secondary"
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+      </motion.div>
+    </motion.div>
+  );
+}
+
 // ── Workspace Card (populated state) ─────────────────────────────────────────
 function WorkspaceCard({ ws, isActive, onClick }) {
   const members = (ws.members || []).map(m => ({
@@ -198,7 +330,7 @@ function WorkspaceSkeleton() {
 }
 
 // ── Active workspace detail panel ─────────────────────────────────────────────
-function WorkspaceDetail({ workspace, projects, allTasks, navigate }) {
+function WorkspaceDetail({ workspace, projects, allTasks, navigate, setActiveProject, onCreateProject }) {
   const [tab, setTab] = useState('projects');
 
   const wsMembers = (workspace.members || []).map(m => ({
@@ -300,7 +432,7 @@ function WorkspaceDetail({ workspace, projects, allTasks, navigate }) {
           <>
             <div className="flex items-center justify-between mb-4">
               <h2 className="section-title">Projects</h2>
-              <button id="new-project-btn" className="btn-primary text-xs px-3 py-1.5" onClick={() => navigate('/board')}>
+              <button id="new-project-btn" className="btn-primary text-xs px-3 py-1.5" onClick={onCreateProject}>
                 <RiAddLine /> New Project
               </button>
             </div>
@@ -310,7 +442,7 @@ function WorkspaceDetail({ workspace, projects, allTasks, navigate }) {
                   <p className="text-4xl mb-3 opacity-40">🗂️</p>
                   <p className="text-sm font-semibold text-bone mb-1">No projects yet</p>
                   <p className="text-xs text-olive mb-4">Create your first project to start tracking work.</p>
-                  <button id="create-project-cta" className="btn-primary mx-auto" onClick={() => navigate('/board')}>
+                  <button id="create-project-cta" className="btn-primary mx-auto" onClick={onCreateProject}>
                     <RiAddLine /> Create Project
                   </button>
                 </div>
@@ -324,7 +456,7 @@ function WorkspaceDetail({ workspace, projects, allTasks, navigate }) {
                   <motion.div
                     key={project._id}
                     variants={item}
-                    onClick={() => navigate('/board')}
+                    onClick={() => { setActiveProject(project); navigate('/board'); }}
                     className="card card-hover p-5 cursor-pointer"
                   >
                     <div className="flex items-start justify-between mb-4">
@@ -400,11 +532,12 @@ export default function Workspace() {
   const {
     workspaces, activeWorkspace, setActiveWorkspace,
     projects, allTasks, loading, error,
-    loadWorkspaces, showToast,
+    loadWorkspaces, showToast, setActiveProject, createProject
   } = useApp();
   const navigate  = useNavigate();
   const [showCreateModal, setShowCreateModal] = useState(false);
-
+  const [showCreateProjectModal, setShowCreateProjectModal] = useState(false);
+ 
   // ── After workspace is created, inject into context ───────────────────────
   const handleWorkspaceCreated = useCallback((ws) => {
     // AppContext.loadWorkspaces will re-fetch; but also eagerly update:
@@ -413,6 +546,19 @@ export default function Workspace() {
     setShowCreateModal(false);
     showToast(`Workspace "${ws.name}" created!`, 'success');
   }, [loadWorkspaces, setActiveWorkspace, showToast]);
+
+  const handleProjectCreated = async (projData) => {
+    try {
+      const proj = await createProject(projData);
+      if (proj) {
+        setShowCreateProjectModal(false);
+        showToast(`Project "${proj.name}" created!`, 'success');
+        navigate('/board');
+      }
+    } catch (e) {
+      showToast(e.message || 'Failed to create project', 'error');
+    }
+  };
 
   // ── Loading state ─────────────────────────────────────────────────────────
   if (loading.workspace && workspaces.length === 0) {
@@ -495,17 +641,25 @@ export default function Workspace() {
               projects={projects}
               allTasks={allTasks}
               navigate={navigate}
+              setActiveProject={setActiveProject}
+              onCreateProject={() => setShowCreateProjectModal(true)}
             />
           )}
         </>
       )}
 
-      {/* Create Workspace Modal */}
+      {/* Create Workspace / Project Modals */}
       <AnimatePresence>
         {showCreateModal && (
           <CreateWorkspaceModal
             onClose={() => setShowCreateModal(false)}
             onCreated={handleWorkspaceCreated}
+          />
+        )}
+        {showCreateProjectModal && (
+          <CreateProjectModal
+            onClose={() => setShowCreateProjectModal(false)}
+            onCreated={handleProjectCreated}
           />
         )}
       </AnimatePresence>

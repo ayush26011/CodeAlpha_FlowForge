@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { DragDropContext } from '@hello-pangea/dnd';
 import { useApp } from '../context/AppContext';
@@ -11,7 +11,7 @@ const COLUMNS = ['backlog', 'todo', 'inprogress', 'review', 'done'];
 const PRIORITIES = ['low', 'medium', 'high', 'urgent'];
 
 export default function ProjectBoard() {
-  const { tasks, moveTask, reorderTasks, activeProject, activeWorkspace, currentUser, loadTasks, showToast } = useApp();
+  const { tasks, moveTask, reorderTasks, activeProject, setActiveProject, activeWorkspace, projects, currentUser, loadTasks, showToast } = useApp();
 
   const [showAddModal, setShowAddModal] = useState(false);
   const [creating, setCreating] = useState(false);
@@ -22,7 +22,29 @@ export default function ProjectBoard() {
     status: 'todo',
     dueDate: '',
     labels: '',
+    projectId: '',
   });
+
+  const handleOpenAddModal = () => {
+    const defaultProjId = activeProject?._id || (projects.length > 0 ? projects[0]._id : '');
+    setForm(f => ({
+      ...f,
+      title: '',
+      description: '',
+      priority: 'medium',
+      status: 'todo',
+      dueDate: '',
+      labels: '',
+      projectId: defaultProjId,
+    }));
+    setShowAddModal(true);
+  };
+
+  useEffect(() => {
+    if (!activeProject && projects && projects.length > 0) {
+      setActiveProject(projects[0]);
+    }
+  }, [activeProject, projects, setActiveProject]);
 
   const onDragEnd = (result) => {
     const { source, destination } = result;
@@ -34,7 +56,6 @@ export default function ProjectBoard() {
     if (srcCol === dstCol) {
       reorderTasks(srcCol, source.index, destination.index);
     } else {
-      // Use _id (MongoDB) with fallback to id (mock data)
       const task = tasks[srcCol][source.index];
       const taskId = task?._id || task?.id;
       if (taskId) moveTask(taskId, srcCol, dstCol);
@@ -44,10 +65,17 @@ export default function ProjectBoard() {
   const handleCreate = async (e) => {
     e.preventDefault();
     if (!form.title.trim()) return;
-    if (!activeProject || !activeWorkspace) {
-      showToast('No active project selected.', 'error');
+
+    const selectedProjectId = activeProject?._id || form.projectId || (projects.length > 0 ? projects[0]._id : null);
+    if (!selectedProjectId) {
+      showToast('Please select a project or create one first.', 'error');
       return;
     }
+    if (!activeWorkspace) {
+      showToast('No active workspace selected.', 'error');
+      return;
+    }
+
     try {
       setCreating(true);
       const payload = {
@@ -55,8 +83,10 @@ export default function ProjectBoard() {
         description: form.description.trim(),
         priority: form.priority,
         status: form.status,
-        projectId: activeProject._id,
+        projectId: selectedProjectId,
+        project: selectedProjectId,
         workspaceId: activeWorkspace._id,
+        workspace: activeWorkspace._id,
         assignee: currentUser._id,
         ...(form.dueDate ? { dueDate: form.dueDate } : {}),
         ...(form.labels.trim() ? { labels: form.labels.split(',').map(l => l.trim()).filter(Boolean) } : {}),
@@ -65,13 +95,16 @@ export default function ProjectBoard() {
       await loadTasks();
       showToast('Task created!', 'success');
       setShowAddModal(false);
-      setForm({ title: '', description: '', priority: 'medium', status: 'todo', dueDate: '', labels: '' });
+      setForm({ title: '', description: '', priority: 'medium', status: 'todo', dueDate: '', labels: '', projectId: '' });
     } catch (err) {
       showToast(err.message, 'error');
     } finally {
       setCreating(false);
     }
   };
+
+  const hasProjects = projects.length > 0;
+  const currentProjectName = activeProject ? activeProject.name : (hasProjects ? 'No Project Selected' : 'No Projects');
 
   return (
     <div className="flex flex-col h-full">
@@ -91,11 +124,29 @@ export default function ProjectBoard() {
             <h1 className="text-base font-bold text-floral tracking-tight">
               {activeProject ? activeProject.name : 'Project Board'}
             </h1>
-            {activeProject && (
-              <p className="text-2xs text-olive">{activeWorkspace?.name}</p>
+            {activeWorkspace && (
+              <p className="text-2xs text-olive">{activeWorkspace.name}</p>
             )}
           </div>
         </div>
+
+        {/* Project Selector dropdown in board header if no project is active */}
+        {!activeProject && hasProjects && (
+          <select
+            onChange={(e) => {
+              const proj = projects.find(p => p._id === e.target.value);
+              if (proj) setActiveProject(proj);
+            }}
+            value=""
+            className="input max-w-xs text-xs py-1.5 px-3 bg-surface border border-border"
+          >
+            <option value="" disabled>Select Project...</option>
+            {projects.map(p => (
+              <option key={p._id} value={p._id}>{p.name}</option>
+            ))}
+          </select>
+        )}
+
         <div className="flex-1" />
         <button className="btn-ghost text-sm gap-1.5">
           <RiFilter3Line className="text-base" />Filter
@@ -103,7 +154,7 @@ export default function ProjectBoard() {
         <button
           id="add-task-btn"
           className="btn-primary text-sm"
-          onClick={() => setShowAddModal(true)}
+          onClick={handleOpenAddModal}
         >
           <RiAddLine />Add Task
         </button>
@@ -111,17 +162,31 @@ export default function ProjectBoard() {
 
       {/* Kanban Board */}
       <div className="flex-1 overflow-x-auto pb-4">
-        <DragDropContext onDragEnd={onDragEnd}>
-          <div className="flex gap-4 min-w-max px-0.5 pb-2">
-            {COLUMNS.map(col => (
-              <KanbanColumn
-                key={col}
-                columnId={col}
-                tasks={tasks[col] || []}
-              />
-            ))}
+        {!activeProject && !hasProjects ? (
+          <div className="card p-12 text-center text-olive bg-surface flex flex-col items-center justify-center border border-border rounded-2xl max-w-xl mx-auto mt-10">
+            <RiLayoutGridLine className="text-5xl opacity-20 mb-3" />
+            <p className="text-sm font-medium">Create a project first.</p>
+            <p className="text-xs text-olive/60 mt-1">Please head over to Workspace and add a new project to start adding tasks.</p>
           </div>
-        </DragDropContext>
+        ) : !activeProject ? (
+          <div className="card p-12 text-center text-olive bg-surface flex flex-col items-center justify-center border border-border rounded-2xl max-w-xl mx-auto mt-10">
+            <RiLayoutGridLine className="text-5xl opacity-20 mb-3" />
+            <p className="text-sm font-medium">Select a project to view board.</p>
+            <p className="text-xs text-olive/60 mt-1">Choose a project from the header select dropdown above to view the Kanban columns.</p>
+          </div>
+        ) : (
+          <DragDropContext onDragEnd={onDragEnd}>
+            <div className="flex gap-4 min-w-max px-0.5 pb-2">
+              {COLUMNS.map(col => (
+                <KanbanColumn
+                  key={col}
+                  columnId={col}
+                  tasks={tasks[col] || []}
+                />
+              ))}
+            </div>
+          </DragDropContext>
+        )}
       </div>
 
       {/* Add Task Modal */}
@@ -157,13 +222,26 @@ export default function ProjectBoard() {
                 </button>
               </div>
 
-              {activeProject ? (
+              {projects.length === 1 ? (
                 <p className="text-xs text-olive -mt-3">
-                  Adding to <span className="text-bone font-medium">{activeProject.name}</span>
+                  Adding to <span className="text-bone font-medium">{projects[0].name}</span>
                 </p>
+              ) : projects.length > 1 ? (
+                <div className="space-y-1.5">
+                  <label className="label">Select Project</label>
+                  <select
+                    value={form.projectId}
+                    onChange={e => setForm(f => ({ ...f, projectId: e.target.value }))}
+                    className="input text-xs"
+                  >
+                    {projects.map(p => (
+                      <option key={p._id} value={p._id}>{p.name}</option>
+                    ))}
+                  </select>
+                </div>
               ) : (
                 <p className="text-xs text-red-400 -mt-3">
-                  No project selected. Switch workspaces or create a project first.
+                  Create a project first.
                 </p>
               )}
 
@@ -175,7 +253,7 @@ export default function ProjectBoard() {
                     value={form.title}
                     onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
                     placeholder="Task title..."
-                    className="input"
+                    className="input text-xs"
                   />
                 </div>
 
@@ -186,7 +264,7 @@ export default function ProjectBoard() {
                     value={form.description}
                     onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
                     placeholder="What needs to be done?"
-                    className="input resize-none"
+                    className="input resize-none text-xs"
                   />
                 </div>
 
@@ -196,7 +274,7 @@ export default function ProjectBoard() {
                     <select
                       value={form.priority}
                       onChange={e => setForm(f => ({ ...f, priority: e.target.value }))}
-                      className="input"
+                      className="input text-xs"
                     >
                       {PRIORITIES.map(p => (
                         <option key={p} value={p} className="capitalize">{p.charAt(0).toUpperCase() + p.slice(1)}</option>
@@ -208,7 +286,7 @@ export default function ProjectBoard() {
                     <select
                       value={form.status}
                       onChange={e => setForm(f => ({ ...f, status: e.target.value }))}
-                      className="input"
+                      className="input text-xs"
                     >
                       <option value="backlog">Backlog</option>
                       <option value="todo">To Do</option>
@@ -226,7 +304,7 @@ export default function ProjectBoard() {
                       type="date"
                       value={form.dueDate}
                       onChange={e => setForm(f => ({ ...f, dueDate: e.target.value }))}
-                      className="input"
+                      className="input text-xs"
                     />
                   </div>
                   <div>
@@ -235,7 +313,7 @@ export default function ProjectBoard() {
                       value={form.labels}
                       onChange={e => setForm(f => ({ ...f, labels: e.target.value }))}
                       placeholder="Frontend, API, Bug"
-                      className="input"
+                      className="input text-xs"
                     />
                   </div>
                 </div>
@@ -244,14 +322,14 @@ export default function ProjectBoard() {
                   <button
                     type="button"
                     onClick={() => setShowAddModal(false)}
-                    className="btn-secondary"
+                    className="btn-secondary text-xs"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    disabled={creating || !activeProject}
-                    className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled={creating || (!activeProject && !hasProjects)}
+                    className="btn-primary text-xs disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {creating ? 'Creating...' : 'Create Task'}
                   </button>

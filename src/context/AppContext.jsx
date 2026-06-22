@@ -148,11 +148,17 @@ export function AppProvider({ children }) {
     try {
       setLoading(l => ({ ...l, project: true }));
       const ps = await projectService.getByWorkspace(workspaceId);
-      setProjects(ps);
+      const normalized = (ps || []).map(p => {
+        p.id = p._id;
+        return p;
+      });
+      setProjects(normalized);
       // Only auto-select the first project if none is active in this workspace
-      if (ps.length > 0) {
-        const hasActiveInNew = ps.some(p => p._id === activeProjectRef.current?._id);
-        if (!hasActiveInNew) setActiveProject(ps[0]);
+      if (normalized.length > 0) {
+        const hasActiveInNew = normalized.some(p => p._id === activeProjectRef.current?._id);
+        if (!hasActiveInNew) {
+          setActiveProject(normalized[0]);
+        }
       } else {
         setActiveProject(null);
       }
@@ -162,6 +168,31 @@ export function AppProvider({ children }) {
       setLoading(l => ({ ...l, project: false }));
     }
   }, [showToast]); // ← stable reference
+
+  const createProject = async (projectData) => {
+    if (!activeWorkspace) {
+      showToast('No active workspace selected', 'error');
+      return null;
+    }
+    try {
+      console.log('Creating project with payload:', { ...projectData, workspaceId: activeWorkspace._id });
+      const newProj = await projectService.create({
+        ...projectData,
+        workspaceId: activeWorkspace._id,
+      });
+      if (newProj) {
+        newProj.id = newProj._id;
+        console.log('Project created successfully:', newProj);
+        setProjects(prev => [...prev, newProj]);
+        setActiveProject(newProj);
+        await loadWorkspaceTasks(activeWorkspace._id);
+        return newProj;
+      }
+    } catch (e) {
+      showToast(e.message, 'error');
+      throw e;
+    }
+  };
 
   const loadWorkspaceTasks = useCallback(async (workspaceId) => {
     if (!workspaceId) return;
@@ -393,7 +424,7 @@ export function AppProvider({ children }) {
       loadWorkspaces, syncWorkspace,
       // Projects
       projects, activeProject, setActiveProject,
-      loadProjects,
+      loadProjects, createProject,
       // Tasks
       tasks, allTasks, setTasks,
       moveTask, reorderTasks, loadTasks,

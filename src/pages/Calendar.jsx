@@ -1,8 +1,8 @@
-import { useState } from 'react';
-import { motion } from 'framer-motion';
+import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useApp } from '../context/AppContext';
-
-import { RiCalendarEventLine, RiArrowLeftSLine, RiArrowRightSLine, RiAddLine } from 'react-icons/ri';
+import taskService from '../services/taskService';
+import { RiCalendarEventLine, RiArrowLeftSLine, RiArrowRightSLine, RiAddLine, RiCloseLine } from 'react-icons/ri';
 
 const DAYS_OF_WEEK = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const MONTHS = [
@@ -11,9 +11,25 @@ const MONTHS = [
 ];
 
 export default function Calendar() {
-  const { allTasks, openTask } = useApp();
+  const { allTasks, openTask, activeWorkspace, projects, currentUser, loadTasks, showToast, activeProject, setActiveProject } = useApp();
   const [currentDate, setCurrentDate] = useState(new Date()); // Default to current month
   const [viewMode, setViewMode] = useState('month'); // month | week
+
+  useEffect(() => {
+    if (!activeProject && projects && projects.length > 0) {
+      setActiveProject(projects[0]);
+    }
+  }, [activeProject, projects, setActiveProject]);
+  
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [creating, setCreating] = useState(false);
+  const [form, setForm] = useState({
+    title: '',
+    description: '',
+    dueDate: '',
+    projectId: '',
+    priority: 'medium',
+  });
 
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
@@ -22,11 +38,21 @@ export default function Calendar() {
   const getTasksForDate = (dateStr) => {
     return allTasks.filter(task => {
       if (!task.dueDate) return false;
-      const d = new Date(task.dueDate);
-      const y = d.getFullYear();
-      const m = String(d.getMonth() + 1).padStart(2, '0');
-      const day = String(d.getDate()).padStart(2, '0');
-      return `${y}-${m}-${day}` === dateStr;
+      let datePart = '';
+      try {
+        if (typeof task.dueDate === 'string') {
+          datePart = task.dueDate.substring(0, 10);
+        } else {
+          datePart = new Date(task.dueDate).toISOString().substring(0, 10);
+        }
+      } catch (e) {
+        const d = new Date(task.dueDate);
+        const y = d.getUTCFullYear();
+        const m = String(d.getUTCMonth() + 1).padStart(2, '0');
+        const day = String(d.getUTCDate()).padStart(2, '0');
+        datePart = `${y}-${m}-${day}`;
+      }
+      return datePart === dateStr;
     });
   };
 
@@ -41,6 +67,46 @@ export default function Calendar() {
     setCurrentDate(new Date(year, month + 1, 1));
   };
 
+  const handleCreate = async (e) => {
+    e.preventDefault();
+    if (!form.title.trim()) return;
+    
+    const selectedProjectId = form.projectId || (projects.length > 0 ? projects[0]._id : null);
+    if (!selectedProjectId) {
+      showToast('Create a project first before adding tasks.', 'error');
+      return;
+    }
+    if (!activeWorkspace) {
+      showToast('Please select a workspace first.', 'error');
+      return;
+    }
+
+    try {
+      setCreating(true);
+      const payload = {
+        title: form.title.trim(),
+        description: form.description.trim(),
+        priority: form.priority,
+        status: 'todo',
+        projectId: selectedProjectId,
+        project: selectedProjectId,
+        workspaceId: activeWorkspace._id,
+        workspace: activeWorkspace._id,
+        assignee: currentUser._id,
+        dueDate: form.dueDate || new Date().toISOString().split('T')[0],
+      };
+      await taskService.create(payload);
+      await loadTasks();
+      showToast('Task added to calendar!', 'success');
+      setShowAddModal(false);
+      setForm({ title: '', description: '', dueDate: '', projectId: '', priority: 'medium' });
+    } catch (err) {
+      showToast(err.message, 'error');
+    } finally {
+      setCreating(false);
+    }
+  };
+
   // Render Month View Grid
   const renderMonthGrid = () => {
     const daysInMonth = getDaysInMonth(year, month);
@@ -48,26 +114,19 @@ export default function Calendar() {
     const totalSlots = Math.ceil((daysInMonth + firstDay) / 7) * 7;
     const gridCells = [];
 
-    // Prev Month Overlapping Days
-    const prevMonthDays = getDaysInMonth(year, month - 1);
-    for (let i = firstDay - 1; i >= 0; i--) {
-      const dayNum = prevMonthDays - i;
-      gridCells.push({ day: dayNum, isCurrentMonth: false, dateStr: `${year}-${String(month).padStart(2, '0')}-${String(dayNum).padStart(2, '0')}` });
-    }
-
-    // Current Month Days
-    for (let i = 1; i <= daysInMonth; i++) {
+    for (let i = 0; i < totalSlots; i++) {
+      const cellDate = new Date(year, month, 1 - firstDay + i);
+      const cellYear = cellDate.getFullYear();
+      const cellMonth = cellDate.getMonth();
+      const cellDay = cellDate.getDate();
+      const isCurrentMonth = cellMonth === month;
+      const dateStr = `${cellYear}-${String(cellMonth + 1).padStart(2, '0')}-${String(cellDay).padStart(2, '0')}`;
+      
       gridCells.push({
-        day: i,
-        isCurrentMonth: true,
-        dateStr: `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`
+        day: cellDay,
+        isCurrentMonth,
+        dateStr
       });
-    }
-
-    // Next Month Overlapping Days
-    const remaining = totalSlots - gridCells.length;
-    for (let i = 1; i <= remaining; i++) {
-      gridCells.push({ day: i, isCurrentMonth: false, dateStr: `${year}-${String(month + 2).padStart(2, '0')}-${String(i).padStart(2, '0')}` });
     }
 
     return (
@@ -118,6 +177,8 @@ export default function Calendar() {
     );
   };
 
+  const hasProjects = projects.length > 0;
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }}
@@ -152,7 +213,20 @@ export default function Calendar() {
               </button>
             ))}
           </div>
-          <button className="btn-primary text-xs">
+          <button
+            onClick={() => {
+              const defaultProjId = activeProject?._id || (projects.length > 0 ? projects[0]._id : '');
+              setForm(f => ({
+                ...f,
+                title: '',
+                description: '',
+                projectId: defaultProjId,
+                dueDate: new Date().toISOString().split('T')[0]
+              }));
+              setShowAddModal(true);
+            }}
+            className="btn-primary text-xs"
+          >
             <RiAddLine /> Add Event
           </button>
         </div>
@@ -168,6 +242,136 @@ export default function Calendar() {
           <p className="text-xs text-olive/60 mt-1">Please toggle back to Monthly layout.</p>
         </div>
       )}
+
+      {/* Add Task Modal */}
+      <AnimatePresence>
+        {showAddModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowAddModal(false)}
+              className="absolute inset-0 bg-smoky/80 backdrop-blur-sm"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 16 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 8 }}
+              transition={{ type: 'spring', damping: 28, stiffness: 300 }}
+              className="max-w-lg w-full p-6 relative z-10 space-y-5 rounded-2xl"
+              style={{
+                background: '#1A1B14',
+                border: '1px solid rgba(42,44,34,0.9)',
+                boxShadow: '0 24px 80px rgba(0,0,0,0.7), 0 8px 32px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05)',
+              }}
+            >
+              <div className="flex items-center justify-between">
+                <h2 className="text-lg font-bold text-floral">Add Task / Event</h2>
+                <button
+                  onClick={() => setShowAddModal(false)}
+                  className="btn-ghost p-1.5"
+                >
+                  <RiCloseLine className="text-xl" />
+                </button>
+              </div>
+
+              {!hasProjects ? (
+                <div className="text-center p-4">
+                  <p className="text-sm text-red-400 font-semibold">Create a project first before adding tasks.</p>
+                  <button
+                    onClick={() => { setShowAddModal(false); }}
+                    className="btn-secondary text-xs mt-3"
+                  >
+                    Close
+                  </button>
+                </div>
+              ) : (
+                <form onSubmit={handleCreate} className="space-y-4">
+                  <div>
+                    <label className="label">Title *</label>
+                    <input
+                      required
+                      value={form.title}
+                      onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
+                      placeholder="Event or Task title..."
+                      className="input text-xs"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="label">Description <span className="text-olive/50">(optional)</span></label>
+                    <textarea
+                      rows={3}
+                      value={form.description}
+                      onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
+                      placeholder="Add details..."
+                      className="input resize-none text-xs"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="label">Project *</label>
+                      <select
+                        value={form.projectId}
+                        onChange={e => setForm(f => ({ ...f, projectId: e.target.value }))}
+                        className="input text-xs"
+                      >
+                        {projects.map(p => (
+                          <option key={p._id} value={p._id}>{p.name}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="label">Priority</label>
+                      <select
+                        value={form.priority}
+                        onChange={e => setForm(f => ({ ...f, priority: e.target.value }))}
+                        className="input text-xs"
+                      >
+                        <option value="low">Low</option>
+                        <option value="medium">Medium</option>
+                        <option value="high">High</option>
+                        <option value="urgent">Urgent</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="label">Due Date *</label>
+                    <input
+                      type="date"
+                      required
+                      value={form.dueDate}
+                      onChange={e => setForm(f => ({ ...f, dueDate: e.target.value }))}
+                      className="input text-xs"
+                    />
+                  </div>
+
+                  <div className="flex justify-end gap-3 pt-2">
+                    <button
+                      type="button"
+                      onClick={() => setShowAddModal(false)}
+                      className="btn-secondary text-xs"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={creating}
+                      className="btn-primary text-xs disabled:opacity-50"
+                    >
+                      {creating ? 'Adding...' : 'Add Event'}
+                    </button>
+                  </div>
+                </form>
+              )}
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }

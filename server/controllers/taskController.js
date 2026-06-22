@@ -19,15 +19,17 @@ const createTask = async (req, res, next) => {
       return res.status(400).json({ success: false, errors: errors.array() });
     }
 
-    const { title, description, projectId, workspaceId, status, priority, assignee, labels, dueDate, checklist } = req.body;
+    const { title, description, projectId, workspaceId, project: bodyProject, workspace: bodyWorkspace, status, priority, assignee, labels, dueDate, checklist } = req.body;
+    const finalProjectId = projectId || bodyProject;
+    const finalWorkspaceId = workspaceId || bodyWorkspace;
 
-    const project = await Project.findById(projectId);
+    const project = await Project.findById(finalProjectId);
     if (!project) return res.status(404).json({ success: false, message: 'Project not found.' });
 
     const task = await Task.create({
       title, description,
-      project: projectId,
-      workspace: workspaceId || project.workspace,
+      project: finalProjectId,
+      workspace: finalWorkspaceId || project.workspace,
       status: status || 'todo',
       priority: priority || 'medium',
       assignee: assignee || null,

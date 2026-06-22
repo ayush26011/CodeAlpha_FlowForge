@@ -50,6 +50,18 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: 'UTC',
     },
+    location: {
+      type: String,
+      default: '',
+    },
+    title: {
+      type: String,
+      default: '',
+    },
+    accountType: {
+      type: String,
+      default: 'Personal',
+    },
     privacy: {
       profileVisibility: { type: Boolean, default: true },
       activityStatus: { type: Boolean, default: true },
@@ -63,6 +75,8 @@ const userSchema = new mongoose.Schema(
       mentions: { type: Boolean, default: true },
       email: { type: Boolean, default: true },
       push: { type: Boolean, default: true },
+      dueDateReminders: { type: Boolean, default: true },
+      workspaceUpdates: { type: Boolean, default: true },
     },
     appearance: {
       themeMode: { type: String, enum: ['light', 'dark', 'system'], default: 'dark' },
