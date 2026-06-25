@@ -231,7 +231,7 @@ Cloudinary
 * Team Chat
 * Project Templates
 * Time Tracking
-* Reporting Dashboard
+* Reporting Dashboard .
 
 ---
 
